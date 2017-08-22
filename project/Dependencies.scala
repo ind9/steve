@@ -13,6 +13,7 @@ object Dependencies {
 
   val testDependencies = Seq(scalaTest, mockito)
 
-  lazy val coreDependencies = Seq(dropwizard) ++ testDependencies
+  lazy val coreDependencies = testDependencies
+  lazy val serverDependencies = Seq(dropwizard) ++ testDependencies
 
 }

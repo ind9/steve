@@ -23,7 +23,7 @@ lazy val steveCore = (project in file("steve-core"))
 lazy val steveServer = (project in file("steve-server"))
   .settings(
     name := "steve-server",
-    libraryDependencies ++= coreDependencies
+    libraryDependencies ++= serverDependencies
   )
   .settings(commonSettings: _*)
   .settings(steveAssembly: _*)
