@@ -8,7 +8,7 @@ object Dependencies {
   val logbackClassic = "ch.qos.logback" % "logback-classic" % logbackVersion
   val logging        = Seq(logbackCore, logbackClassic)
 
-  val scalaTest = "org.scalatest" %% "scalatest"   % "2.2.5"   % Test
+  val scalaTest = "org.scalatest" %% "scalatest"   % "3.0.4"   % Test
   val mockito   = "org.mockito"   % "mockito-core" % "1.10.19" % Test
 
   val testDependencies = Seq(scalaTest, mockito)
