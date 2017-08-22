@@ -1,6 +1,7 @@
 import java.net.InetAddress
 
 import Dependencies._
+import sbt.Keys._
 import sbt.Package.ManifestAttributes
 
 lazy val steve = Project(
@@ -12,10 +13,21 @@ lazy val steve = Project(
 
 lazy val steveCore = (project in file("steve-core"))
   .settings(
-  name := "steve-core",
-  libraryDependencies ++= coreDependencies
-  ).settings(publishSettings: _*)
+    name := "steve-core",
+    libraryDependencies ++= coreDependencies
+  )
+  .settings(commonSettings: _*)
+  .settings(publishSettings: _*)
   .settings(sonatypePublishSettings: _*)
+
+lazy val steveServer = (project in file("steve-server"))
+  .settings(
+    name := "steve-server",
+    libraryDependencies ++= coreDependencies
+  )
+  .settings(commonSettings: _*)
+  .settings(steveAssembly: _*)
+  .enablePlugins(JavaAppPackaging)
 
 lazy val commonSettings = Seq(
   organization := "com.indix",
@@ -27,7 +39,7 @@ lazy val commonSettings = Seq(
   organizationHomepage := Some(url("http://www.indix.com")),
   scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
   javacOptions ++= Seq("-Xlint:deprecation", "-source", "1.7")
-)
+) ++ net.virtualvoid.sbt.graph.Plugin.graphSettings
 
 lazy val publishSettings = Seq(
   publishMavenStyle := true,
@@ -61,12 +73,35 @@ lazy val publishSettings = Seq(
           <url>http://www.indix.com</url>
         </developer>
       </developers>
-) ++ net.virtualvoid.sbt.graph.Plugin.graphSettings
-
+)
 
 lazy val sonatypePublishSettings = Seq(
   /* START - sonatype publish related settings */
   useGpg := true,
   pgpPassphrase := Some(Array())
   /* END - sonatype publish related settings */
+)
+
+lazy val steveAssembly = Seq(
+  assemblyMergeStrategy in assembly := {
+    case PathList(ps @ _*) if List("package-info.class", "plugin.properties", "mime.types").exists(ps.last.endsWith) =>
+      MergeStrategy.first
+    case "reference.conf" | "rootdoc.txt" =>
+      MergeStrategy.concat
+    case "LICENSE" | "LICENSE.txt" =>
+      MergeStrategy.discard
+    case PathList("META-INF", xs @ _*) =>
+      xs map {
+        _.toLowerCase
+      } match {
+        case ("manifest.mf" :: Nil) =>
+          MergeStrategy.discard
+        case ps @ (x :: xs) if ps.last.endsWith(".sf") || ps.last.endsWith(".dsa") || ps.last.endsWith(".rsa") =>
+          MergeStrategy.discard
+        case ("log4j.properties" :: Nil) =>
+          MergeStrategy.discard
+        case _ => MergeStrategy.first
+      }
+    case _ => MergeStrategy.deduplicate
+  }
 )
