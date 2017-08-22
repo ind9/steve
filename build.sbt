@@ -40,8 +40,29 @@ lazy val publishSettings = Seq(
       Some("snapshots" at nexus + "content/repositories/snapshots")
     else
       Some("releases" at nexus + "service/local/staging/deploy/maven2")
-  }
-)
+  },
+  pomExtra :=
+    <url>https://github.com/ind9/steve</url>
+      <licenses>
+        <license>
+          <name>Apache License</name>
+          <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+      <scm>
+        <url>git@github.com:indix/steve.git</url>
+        <connection>scm:git:git@github.com:indix/steve.git</connection>
+      </scm>
+      <developers>
+        <developer>
+          <id>indix</id>
+          <name>Indix</name>
+          <url>http://www.indix.com</url>
+        </developer>
+      </developers>
+) ++ net.virtualvoid.sbt.graph.Plugin.graphSettings
+
 
 lazy val sonatypePublishSettings = Seq(
   /* START - sonatype publish related settings */
