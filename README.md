@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ind9/steve.svg?branch=master)](https://travis-ci.org/ind9/steve)
+
 # steve
 
 Steve is a Job State server that holds information regarding your job and it's associated items.
