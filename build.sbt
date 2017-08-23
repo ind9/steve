@@ -29,9 +29,9 @@ lazy val steveServer = (project in file("steve-server"))
   .settings(steveAssembly: _*)
   .enablePlugins(JavaAppPackaging)
 
-lazy val steveClient = (project in file("steve-client"))
+lazy val steveClient = (project in file("steve-client-scala"))
   .settings(
-    name := "steve-client",
+    name := "steve-client-scala",
     libraryDependencies ++= clientDependencies
   )
   .settings(commonSettings: _*)
