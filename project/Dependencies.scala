@@ -15,5 +15,6 @@ object Dependencies {
 
   lazy val coreDependencies = testDependencies
   lazy val serverDependencies = Seq(dropwizard) ++ testDependencies
+  lazy val clientDependencies = testDependencies
 
 }

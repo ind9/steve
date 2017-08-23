@@ -29,6 +29,15 @@ lazy val steveServer = (project in file("steve-server"))
   .settings(steveAssembly: _*)
   .enablePlugins(JavaAppPackaging)
 
+lazy val steveClient = (project in file("steve-client"))
+  .settings(
+    name := "steve-client",
+    libraryDependencies ++= clientDependencies
+  )
+  .settings(commonSettings: _*)
+  .settings(publishSettings: _*)
+  .settings(sonatypePublishSettings: _*)
+
 lazy val commonSettings = Seq(
   organization := "com.indix",
   packageOptions := Seq(ManifestAttributes(("Built-By", InetAddress.getLocalHost.getHostName))),
