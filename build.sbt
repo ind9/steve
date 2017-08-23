@@ -8,7 +8,7 @@ lazy val steve = Project(
   id = "steve",
   base = file("."),
   //  settings = defaultSettings,
-  aggregate = Seq(steveCore)
+  aggregate = Seq(steveCore, steveServer, steveScalaClient)
 )
 
 lazy val steveCore = (project in file("steve-core"))
@@ -27,9 +27,10 @@ lazy val steveServer = (project in file("steve-server"))
   )
   .settings(commonSettings: _*)
   .settings(steveAssembly: _*)
+  .dependsOn(steveCore)
   .enablePlugins(JavaAppPackaging)
 
-lazy val steveClient = (project in file("steve-client-scala"))
+lazy val steveScalaClient = (project in file("steve-client-scala"))
   .settings(
     name := "steve-client-scala",
     libraryDependencies ++= clientDependencies
@@ -37,6 +38,7 @@ lazy val steveClient = (project in file("steve-client-scala"))
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
   .settings(sonatypePublishSettings: _*)
+  .dependsOn(steveCore)
 
 lazy val commonSettings = Seq(
   organization := "com.indix",
