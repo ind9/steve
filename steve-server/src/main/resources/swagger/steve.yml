@@ -1,0 +1,99 @@
+---
+swagger: "2.0"
+info:
+  title: Steve v1
+  description: >
+    API specification for the [Steve](http://github.com/ind9/steve).
+  version: 1.0.0
+  contact:
+    email: scp@indix.com
+    name: scp@indix.com
+    url: http://github.com/ind9/steve
+basePath: "/v1"
+definitions:
+  Job:
+    type: object
+    properties:
+      id:
+        type: string
+      created_at:
+        type: integer
+        format: "int64"
+      attributes:
+        type: object
+      app_name:
+        type: string
+
+paths:
+  /health:
+    get:
+      tags:
+        - "steve"
+      summary: "Health of the system"
+      description: >
+        Returns a OK message if the service is running.
+      produces:
+        - "text/plain"
+      responses:
+        200:
+          description: Returns a OK message if the service is running.
+
+  /job:
+    post:
+      tags:
+        - "steve"
+      summary: "Creates a new job for the given payload"
+      description: >
+        Creates a new job for the given payload
+      produces:
+        - "application/json"
+      consumes:
+        - "application/json"
+      parameters:
+      - name: "job"
+        in: body
+        description: "job id"
+        required: true
+        schema:
+          $ref: '#/definitions/Job'
+      responses:
+        200:
+          description: Returns the Job Id associated with the given payload
+
+  /job/{id}:
+    get:
+      tags:
+      - "steve"
+      summary: "Returns the status of a particular job"
+      description: >
+        Returns the current status of the particular job defined by it's {id}.
+      produces:
+        - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "job id"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: Returns the status of a particular job.
+
+  /job/{id}/items:
+    get:
+      tags:
+      - "steve"
+      summary: "Returns the list of items associated with a job"
+      description: >
+        Returns the list of items associated with a particular job defined by it's {id}.
+      produces:
+        - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "job id"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: Returns the list of items of a particular job.
