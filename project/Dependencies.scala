@@ -2,6 +2,8 @@ import sbt._
 
 object Dependencies {
   val dropwizard = "com.datasift.dropwizard.scala" %% "dropwizard-scala-core" % "1.1.0-2"
+  val mongo = "org.mongodb.scala" %% "mongo-scala-driver" % "2.1.0"
+  val guice = "com.hubspot.dropwizard" % "dropwizard-guice" % "1.0.6.0"
 
   val logbackVersion = "1.1.7"
   val logbackCore    = "ch.qos.logback" % "logback-core" % logbackVersion
@@ -14,6 +16,6 @@ object Dependencies {
   val testDependencies = Seq(scalaTest, mockito)
 
   lazy val coreDependencies = testDependencies
-  lazy val serverDependencies = Seq(dropwizard) ++ testDependencies
+  lazy val serverDependencies = Seq(mongo, dropwizard, guice) ++ testDependencies
 
 }

@@ -1,0 +1,19 @@
+server:
+  rootPath: /*
+  applicationContextPath: /
+  adminContextPath: /admin
+  applicationConnectors:
+    - type: http
+      port: 9092
+  adminConnectors:
+    - type: http
+      port: 9093
+
+mongoConf:
+ hosts:
+  -
+   host: "localhost"
+   port: 27017
+  #-
+  # host: two
+  # port: 1234

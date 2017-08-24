@@ -1,7 +1,7 @@
 import java.net.InetAddress
 
 import Dependencies._
-import sbt.Keys._
+import sbt.Keys.{resolvers, _}
 import sbt.Package.ManifestAttributes
 
 lazy val steve = Project(
@@ -38,7 +38,9 @@ lazy val commonSettings = Seq(
   organizationName := "Indix",
   organizationHomepage := Some(url("http://www.indix.com")),
   scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
-  javacOptions ++= Seq("-Xlint:deprecation", "-source", "1.7")
+  javacOptions ++= Seq("-Xlint:deprecation", "-source", "1.7"),
+  resolvers += "snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+  resolvers += "releases"  at "https://oss.sonatype.org/content/repositories/releases"
 )
 
 lazy val publishSettings = Seq(
