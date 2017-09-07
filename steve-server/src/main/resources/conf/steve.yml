@@ -1,0 +1,20 @@
+server:
+  rootPath: /*
+  applicationContextPath: /
+  adminContextPath: /admin
+  applicationConnectors:
+    - type: http
+      port: 9092
+  adminConnectors:
+    - type: http
+      port: 9093
+
+datasource:
+  clazz: org.postgresql.ds.PGSimpleDataSource
+  serverName: localhost
+  portNumber: 5432
+  databaseName: steve
+  user: indix
+  password: indix123
+  numThreads: 10
+
