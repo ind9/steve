@@ -1,8 +1,12 @@
 package steve
 
+import java.util.concurrent.Executors
+
 import com.google.inject._
 import io.dropwizard.Configuration
 import slick.jdbc.JdbcBackend
+
+import scala.concurrent.ExecutionContext
 
 case class DataSourceConfiguration(clazz: String,
                                    serverName: String,
@@ -13,8 +17,11 @@ case class DataSourceConfiguration(clazz: String,
                                    numThreads: Int)
 case class SteveConfiguration(datasource:DataSourceConfiguration) extends Configuration
 class SteveModule extends AbstractModule {
+  lazy val executorService =  ExecutionContext.fromExecutorService(Executors.newCachedThreadPool())
+
   override def configure(): Unit = {
     bind(classOf[slick.jdbc.JdbcBackend.Database]).toProvider(classOf[DatabaseProvider])
+    bind(classOf[ExecutionContext]).toInstance(executorService)
   }
 }
 

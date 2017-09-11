@@ -45,9 +45,9 @@ class Jobs @Inject()(db: Database) extends TableQuery(new JobTable(_)) {
     }, Duration.Inf)*/
 
     val toBeInserted = this ++= jobs
-    Await.result(db.run {
+    db.run {
       DBIO.seq(toBeInserted)
-    }, Duration.Inf)
+    }
   }
 
 }
