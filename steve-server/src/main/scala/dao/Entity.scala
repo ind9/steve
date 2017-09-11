@@ -2,7 +2,7 @@ package dao
 
 import java.util.Date
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import dao.StevePostgresProfile.api._
 import domain.Job
 import play.api.libs.json.JsValue
@@ -30,6 +30,7 @@ class JobTable(tag: Tag) extends Table[Job](tag, Some("public"), "job"){
  // val db = Database.forConfig("steveDatasource")
 //}
 
+@Singleton
 class Jobs @Inject()(db: Database) extends TableQuery(new JobTable(_)) {
 
   def insert(jobs: List[Job]) = try {
