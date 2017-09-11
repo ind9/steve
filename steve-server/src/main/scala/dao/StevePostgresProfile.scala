@@ -27,10 +27,11 @@ trait StevePostgresProfile extends ExPostgresProfile
         (v) => utils.SimpleArrayUtils.mkString[JsValue](_.toString())(v)
       ).to(_.toList)
     implicit val JavaUtilDateMapper =
-      MappedColumnType .base[java.util.Date, java.sql.Timestamp] (
+      MappedColumnType.base[java.util.Date, java.sql.Timestamp](
         d => new java.sql.Timestamp(d.getTime),
         d => new java.util.Date(d.getTime))
   }
+
 }
 
 object StevePostgresProfile extends StevePostgresProfile

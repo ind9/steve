@@ -6,7 +6,6 @@ import com.google.inject.{Inject, Singleton}
 import dao.StevePostgresProfile.api._
 import domain.Job
 import play.api.libs.json.JsValue
-import slick.sql.SqlProfile.ColumnOption
 
 import scala.concurrent.Future
 
@@ -14,9 +13,9 @@ class JobTable(tag: Tag) extends Table[Job](tag, Some("public"), "job"){
   def id = column[Long]("id", O.AutoInc, O.PrimaryKey)
   def appName = column[String]("app_name")
   def status = column[String]("status")
-  def createdAt = column[Date]("created_at", O.SqlType("timestamp default now()"))
-  def updatedAt = column[Date]("updated_at")
-  def attributes = column[JsValue]("attributes")
+  def createdAt = column[Date]("created_at", O.Default(new Date()), O.SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
+  def updatedAt = column[Option[Date]]("updated_at")
+  def attributes = column[Option[JsValue]]("attributes")
 
   def * = (id, appName, status, createdAt, updatedAt, attributes) <> (Job.tupled, Job.unapply)
 }

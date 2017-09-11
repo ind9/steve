@@ -2,15 +2,13 @@ package controller
 
 import java.util.Date
 import javax.ws.rs.container.{AsyncResponse, Suspended}
-import javax.ws.rs.core.Response
+import javax.ws.rs.core.{MediaType, Response}
 import javax.ws.rs.core.Response.Status
-import javax.ws.rs.core.MediaType
-import javax.ws.rs.{GET, PUT, Path, PathParam, Produces}
+import javax.ws.rs._
 
 import com.google.inject.Inject
 import dao.Jobs
 import domain.Job
-import play.api.libs.json.JsObject
 import steve.SteveConfiguration
 
 import scala.concurrent.ExecutionContext
@@ -20,13 +18,15 @@ import scala.util.{Failure, Success}
 class JobController @Inject()(steveConfiguration: SteveConfiguration, jobs: Jobs, implicit val ec: ExecutionContext) {
 
   @PUT
-  @Path("/{id}")
+  @Path("/")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  def putDetails(@Suspended res: AsyncResponse) = {
-    // TODO - get all job details from PUT request body.
-    jobs.insert(List(Job(123,"test","test",new Date,new Date, JsObject.empty))).onComplete {
+  def putDetails(job: Job, @Suspended res: AsyncResponse) = {
+    val newJob: Job = job.copy(createdAt = new Date())
+    jobs.insert(List(newJob)).onComplete {
       case Success(_) => res.resume(Response.status(Status.CREATED).build())
-      case Failure(_) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).build())
+      case Failure(error) => {
+        println(error.getMessage); error.printStackTrace(); res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).build())
+      }
     }
   }
 
