@@ -4,11 +4,12 @@ import java.util.Date
 
 import com.google.inject.{Inject, Singleton}
 import dao.StevePostgresProfile.api._
-import domain.Job
+import domain.{Job, JobJson}
 import play.api.libs.json.JsValue
 import slick.jdbc.meta.MTable
+
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 
 class JobTable(tag: Tag) extends Table[Job](tag, Some("public"), "job"){
@@ -50,4 +51,9 @@ class Jobs @Inject()(db: Database) extends TableQuery(new JobTable(_)) {
     }
   }
 
+  def select(jobId: Long): Future[Option[Job]] = {
+    db.run {
+      this.filter(_.id === jobId).result.headOption
+    }
+  }
 }
