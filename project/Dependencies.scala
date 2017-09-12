@@ -21,7 +21,7 @@ object Dependencies {
 
   val testDependencies = Seq(scalaTest, mockito)
 
-  lazy val coreDependencies = Seq(playJSON) ++ testDependencies
+  lazy val coreDependencies = Seq() ++ testDependencies
   lazy val serverDependencies = Seq(dropwizard, guice, postgres, slick, slickHikaricp, slickPg, slickPgPlayJSON, typesafe, flyway) ++ testDependencies
   lazy val clientDependencies = testDependencies
 

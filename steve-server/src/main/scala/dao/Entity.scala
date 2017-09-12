@@ -2,10 +2,10 @@ package dao
 
 import java.util.Date
 
+import com.github.tminglei.slickpg._
 import com.google.inject.{Inject, Singleton}
 import dao.StevePostgresProfile.api._
 import domain.Job
-import play.api.libs.json.JsValue
 
 import scala.concurrent.Future
 
@@ -15,7 +15,7 @@ class JobTable(tag: Tag) extends Table[Job](tag, Some("public"), "job"){
   def status = column[String]("status")
   def createdAt = column[Date]("created_at", O.Default(new Date()), O.SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
   def updatedAt = column[Option[Date]]("updated_at")
-  def attributes = column[Option[JsValue]]("attributes")
+  def attributes = column[Map[String, String]]("attributes")
 
   def * = (id, appName, status, createdAt, updatedAt, attributes) <> (Job.tupled, Job.unapply)
 }
@@ -32,16 +32,6 @@ class JobTable(tag: Tag) extends Table[Job](tag, Some("public"), "job"){
 class Jobs @Inject()(db: Database) extends TableQuery(new JobTable(_)) {
 
   def insert(jobs: List[Job]) = try {
-   // val toBeInserted = jobs.map(job => Jobs += job)
-    /*Await.result(db.run {
-      DBIO.seq(
-        MTable.getTables map (tables => {
-          if (!tables.exists(_.name.name == this.baseTableRow.tableName))
-            db.run(this.schema.create)
-        }))
-
-    }, Duration.Inf)*/
-
     val toBeInserted = this ++= jobs
     db.run {
       DBIO.seq(toBeInserted)

@@ -7,7 +7,7 @@ import slick.jdbc.JdbcCapabilities
 
 trait StevePostgresProfile extends ExPostgresProfile
   with PgArraySupport
-  with PgPlayJsonSupport
+  with PgHStoreSupport
   with PgDate2Support {
   def pgjson = "jsonb" // jsonb support is in postgres 9.4.0 onward; for 9.3.x use "json"
 
@@ -19,7 +19,7 @@ trait StevePostgresProfile extends ExPostgresProfile
 
   object StevePostgresAPI extends API with ArrayImplicits
     with DateTimeImplicits
-    with JsonImplicits {
+    with HStoreImplicits {
     implicit val strListTypeMapper = new SimpleArrayJdbcType[String]("text").to(_.toList)
     implicit val playJsonArrayTypeMapper =
       new AdvancedArrayJdbcType[JsValue](pgjson,

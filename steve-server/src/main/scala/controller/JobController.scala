@@ -20,7 +20,7 @@ class JobController @Inject()(steveConfiguration: SteveConfiguration, jobs: Jobs
   @PUT
   @Path("/")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  def putDetails(job: Job, @Suspended res: AsyncResponse) = {
+  def createJob(job: Job, @Suspended res: AsyncResponse) = {
     val newJob: Job = job.copy(createdAt = new Date())
     jobs.insert(List(newJob)).onComplete {
       case Success(_) => res.resume(Response.status(Status.CREATED).build())
@@ -33,7 +33,7 @@ class JobController @Inject()(steveConfiguration: SteveConfiguration, jobs: Jobs
   @GET
   @Path("/{id}")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  def getDetails(@PathParam("id") jobId: Long, @Suspended res: AsyncResponse) = {
+  def getJob(@PathParam("id") jobId: Long, @Suspended res: AsyncResponse) = {
     jobs.select(jobId).onComplete {
       case Success(Some(job)) => res.resume(Response.status(Status.OK).entity(job).build())
       case Success(None) => res.resume(Response.status(Status.NOT_FOUND).entity(Map("id" -> jobId, "msg" -> "Not Found")).build())
@@ -44,7 +44,7 @@ class JobController @Inject()(steveConfiguration: SteveConfiguration, jobs: Jobs
   @POST
   @Path("/{id}")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  def updateDetails(@PathParam("id") jobId: Long, job: Job, @Suspended res: AsyncResponse) = {
+  def updateJob(@PathParam("id") jobId: Long, job: Job, @Suspended res: AsyncResponse) = {
     val updatedJob: Job = job.copy(id = jobId, updatedAt = Some(new Date()))
     jobs.update(updatedJob).onComplete {
       case Success(_) => res.resume(Response.status(Status.OK).entity(updatedJob).build())

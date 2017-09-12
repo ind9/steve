@@ -2,11 +2,9 @@ package domain
 
 import java.util.Date
 
-import play.api.libs.json.JsValue
-
 case class Job(id: Long,
                appName: String,
                status: String,
                createdAt: Date,
                updatedAt: Option[Date],
-               attributes: Option[JsValue])
+               attributes: Map[String,String])
