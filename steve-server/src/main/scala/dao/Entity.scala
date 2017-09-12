@@ -1,8 +1,7 @@
 package dao
 
-import java.util.Date
+import java.util.{Date, UUID}
 
-import com.github.tminglei.slickpg._
 import com.google.inject.{Inject, Singleton}
 import dao.StevePostgresProfile.api._
 import domain.Job
@@ -10,7 +9,7 @@ import domain.Job
 import scala.concurrent.Future
 
 class JobTable(tag: Tag) extends Table[Job](tag, Some("public"), "job"){
-  def id = column[Long]("id", O.AutoInc, O.PrimaryKey)
+  def id = column[UUID]("id", O.PrimaryKey)
   def appName = column[String]("app_name")
   def status = column[String]("status")
   def createdAt = column[Date]("created_at", O.Default(new Date()), O.SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
@@ -38,7 +37,7 @@ class Jobs @Inject()(db: Database) extends TableQuery(new JobTable(_)) {
     }
   }
 
-  def select(jobId: Long): Future[Option[Job]] = {
+  def select(jobId: UUID): Future[Option[Job]] = {
     db.run {
       this.filter(_.id === jobId).result.headOption
     }
@@ -50,7 +49,7 @@ class Jobs @Inject()(db: Database) extends TableQuery(new JobTable(_)) {
     }
   }
 
-  def delete(jobId: Long): Future[Int] = {
+  def delete(jobId: UUID): Future[Int] = {
     db.run {
       this.filter(_.id === jobId).delete
     }

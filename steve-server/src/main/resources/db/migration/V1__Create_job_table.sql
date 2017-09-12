@@ -1,5 +1,5 @@
 create table "job" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" UUID PRIMARY KEY,
   "app_name" TEXT NOT NULL,
   "status" TEXT NOT NULL,
   "attributes" HSTORE NULL DEFAULT NULL,

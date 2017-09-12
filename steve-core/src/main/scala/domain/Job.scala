@@ -1,8 +1,8 @@
 package domain
 
-import java.util.Date
+import java.util.{Date, UUID}
 
-case class Job(id: Long,
+case class Job(id: UUID,
                appName: String,
                status: String,
                createdAt: Date,
