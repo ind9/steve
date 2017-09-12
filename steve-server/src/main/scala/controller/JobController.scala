@@ -40,4 +40,15 @@ class JobController @Inject()(steveConfiguration: SteveConfiguration, jobs: Jobs
       case Failure(_) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).build())
     }
   }
+
+  @POST
+  @Path("/{id}")
+  @Produces(Array(MediaType.APPLICATION_JSON))
+  def updateDetails(@PathParam("id") jobId: Long, job: Job, @Suspended res: AsyncResponse) = {
+    val updatedJob: Job = job.copy(id = jobId, updatedAt = Some(new Date()))
+    jobs.update(updatedJob).onComplete {
+      case Success(_) => res.resume(Response.status(Status.OK).entity(updatedJob).build())
+      case Failure(_) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).build())
+    }
+  }
 }

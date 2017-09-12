@@ -53,4 +53,10 @@ class Jobs @Inject()(db: Database) extends TableQuery(new JobTable(_)) {
       this.filter(_.id === jobId).result.headOption
     }
   }
+
+  def update(updatedJob: Job): Future[Int] = {
+    db.run {
+      this.filter(_.id === updatedJob.id).update(updatedJob)
+    }
+  }
 }
