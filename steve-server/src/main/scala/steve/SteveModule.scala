@@ -15,9 +15,11 @@ case class DataSourceConfiguration(clazz: String,
                                    user: String,
                                    password: String,
                                    numThreads: Int)
-case class SteveConfiguration(datasource:DataSourceConfiguration) extends Configuration
+
+case class SteveConfiguration(datasource: DataSourceConfiguration) extends Configuration
+
 class SteveModule extends AbstractModule {
-  lazy val executorService =  ExecutionContext.fromExecutorService(Executors.newCachedThreadPool())
+  lazy val executorService = ExecutionContext.fromExecutorService(Executors.newCachedThreadPool())
 
   override def configure(): Unit = {
     bind(classOf[slick.jdbc.JdbcBackend.Database]).toProvider(classOf[DatabaseProvider])

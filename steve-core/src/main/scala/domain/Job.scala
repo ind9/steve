@@ -4,7 +4,7 @@ import java.util.{Date, UUID}
 
 case class Job(id: UUID,
                appName: String,
-               status: String,
+               state: String,
                createdAt: Date,
                updatedAt: Option[Date],
-               attributes: Map[String,String])
+               attributes: Map[String, String])
