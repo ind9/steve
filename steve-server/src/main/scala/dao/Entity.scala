@@ -49,4 +49,10 @@ class Jobs @Inject()(db: Database) extends TableQuery(new JobTable(_)) {
       this.filter(_.id === updatedJob.id).update(updatedJob)
     }
   }
+
+  def delete(jobId: Long): Future[Int] = {
+    db.run {
+      this.filter(_.id === jobId).delete
+    }
+  }
 }

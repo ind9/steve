@@ -23,7 +23,7 @@ class JobController @Inject()(steveConfiguration: SteveConfiguration, jobs: Jobs
   def createJob(job: Job, @Suspended res: AsyncResponse) = {
     val newJob: Job = job.copy(createdAt = new Date())
     jobs.insert(List(newJob)).onComplete {
-      case Success(_) => res.resume(Response.status(Status.CREATED).build())
+      case Success(result) => res.resume(Response.status(Status.CREATED).entity(result.toString).build())
       case Failure(error) => {
         println(error.getMessage); error.printStackTrace(); res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).build())
       }
@@ -48,6 +48,17 @@ class JobController @Inject()(steveConfiguration: SteveConfiguration, jobs: Jobs
     val updatedJob: Job = job.copy(id = jobId, updatedAt = Some(new Date()))
     jobs.update(updatedJob).onComplete {
       case Success(_) => res.resume(Response.status(Status.OK).entity(updatedJob).build())
+      case Failure(_) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).build())
+    }
+  }
+
+  @DELETE
+  @Path("/{id}")
+  @Produces(Array(MediaType.APPLICATION_JSON))
+  def deleteJob(@PathParam("id") jobId: Long, @Suspended res: AsyncResponse) = {
+    jobs.delete(jobId).onComplete {
+      case Success(rowsDeleted) if rowsDeleted == 0 => res.resume(Response.status(Status.NOT_FOUND).entity(Map("id" -> jobId, "msg" -> "Not Found")).build())
+      case Success(rowsDeleted) => res.resume(Response.status(Status.OK).entity(Map("id" -> jobId, "msg" -> s"Deleted", "rowsAffected" -> rowsDeleted)).build())
       case Failure(_) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).build())
     }
   }
