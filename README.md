@@ -2,7 +2,7 @@
 
 # steve
 
-![steve][docs/logo.svg]
+<img src="docs/logo.svg" alt="alt text" width="169px" height="169px">
 
 Steve is a Job state server that holds information regarding your job and it's associated items.
 
