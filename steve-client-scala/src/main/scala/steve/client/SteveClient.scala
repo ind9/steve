@@ -1,5 +1,7 @@
 package steve.client
 
+import java.util.UUID
+
 import domain.Job
 import utils.JsonUtils
 
@@ -15,5 +17,13 @@ class SteveClient(httpClient: BaseHttp, host: String) {
       .asString
     val jobInfo = JsonUtils.fromJson[Map[String, String]](response.body)
     jobInfo.get("id")
+  }
+
+  def getJob(jobId: UUID): Job = {
+    val response = httpClient(host + "/job")
+          .method("GET")
+          .asString
+    val jobInfo = JsonUtils.fromJson[Job](response.body)
+    jobInfo
   }
 }
