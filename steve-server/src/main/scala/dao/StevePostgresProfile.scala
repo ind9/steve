@@ -1,7 +1,6 @@
 package dao
 
 import com.github.tminglei.slickpg._
-import play.api.libs.json.{JsValue, Json}
 import slick.basic.Capability
 import slick.jdbc.JdbcCapabilities
 
@@ -21,11 +20,6 @@ trait StevePostgresProfile extends ExPostgresProfile
     with DateTimeImplicits
     with HStoreImplicits {
     implicit val strListTypeMapper = new SimpleArrayJdbcType[String]("text").to(_.toList)
-    implicit val playJsonArrayTypeMapper =
-      new AdvancedArrayJdbcType[JsValue](pgjson,
-        (s) => utils.SimpleArrayUtils.fromString[JsValue](Json.parse)(s).orNull,
-        (v) => utils.SimpleArrayUtils.mkString[JsValue](_.toString())(v)
-      ).to(_.toList)
     implicit val JavaUtilDateMapper =
       MappedColumnType.base[java.util.Date, java.sql.Timestamp](
         d => new java.sql.Timestamp(d.getTime),
