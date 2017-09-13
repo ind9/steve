@@ -2,7 +2,7 @@ package steve.client
 
 import java.util.{Date, UUID}
 
-import domain.Job
+import domain.{Item, Job}
 import org.mockito.Mockito._
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
@@ -75,6 +75,72 @@ class SteveClientSpec extends FlatSpec {
     }.thenReturn(HttpResponse[String](jsonResponse, 200, Map()))
 
     val response = client.deleteJob(jobId)
+    response should be(expectedResponse.get("rowsAffected"))
+  }
+
+  "Client" should "create a new Item and return Item ID" in {
+    val itemId = UUID.randomUUID
+    val jobId = UUID.randomUUID
+    val expectedResponse = Map("id" -> itemId.toString, "msg" -> "Created")
+    val jsonResponse = JsonUtils.toJson(expectedResponse)
+    val item = Item(id = itemId, jobId = jobId, status = "START", createdAt = new Date(), updatedAt = None, attributes = Map("test" -> "test"))
+
+    when {
+      mockHttp(s"${host}/item")
+        .postData(JsonUtils.toJson(item))
+        .method("PUT")
+        .asString
+    }.thenReturn(HttpResponse[String](jsonResponse, 201, Map()))
+
+    val response = client.addItem(item)
+    response should be(expectedResponse.get("id"))
+  }
+
+  "Client" should "get a Item's details for a given Item ID" in {
+    val itemId = UUID.randomUUID
+    val jobId = UUID.randomUUID
+    val dummyItem = Item(id = itemId, jobId = jobId, status = "START", createdAt = new Date(), updatedAt = None, attributes = Map("test" -> "test"))
+    val dummyResponse = JsonUtils.toJson(dummyItem)
+
+    when {
+      mockHttp(s"${host}/item/${itemId.toString}")
+        .method("GET")
+        .asString
+    }.thenReturn(HttpResponse[String](dummyResponse, 200, Map()))
+
+    val response = client.getItem(itemId)
+    response should be(dummyItem)
+  }
+
+  "Client" should "update a Item's details" in {
+    val itemId = UUID.randomUUID
+    val jobId = UUID.randomUUID
+    val dummyItem = Item(id = itemId, jobId = jobId, status = "UPDATING", createdAt = new Date(), updatedAt = None, attributes = Map("test" -> "test"))
+    val dummyResponse = JsonUtils.toJson(dummyItem)
+
+    when {
+      mockHttp(s"${host}/item/${itemId.toString}")
+        .postData(JsonUtils.toJson(dummyItem))
+        .method("POST")
+        .asString
+    }.thenReturn(HttpResponse[String](dummyResponse, 200, Map()))
+
+    val response = client.updateItem(itemId, dummyItem)
+    response should be(dummyItem)
+  }
+
+  "Client" should "get a delete a Item, given an Item ID" in {
+    val itemId = UUID.randomUUID
+    val expectedResponse = Map("id" -> itemId.toString, "msg" -> "Deleted", "rowsAffected" -> "1")
+    val jsonResponse = JsonUtils.toJson(expectedResponse)
+
+    when {
+      mockHttp(s"${host}/item/${itemId.toString}")
+        .method("DELETE")
+        .asString
+    }.thenReturn(HttpResponse[String](jsonResponse, 200, Map()))
+
+    val response = client.deleteItem(itemId)
     response should be(expectedResponse.get("rowsAffected"))
   }
 }
