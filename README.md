@@ -2,7 +2,9 @@
 
 # steve
 
-Steve is a Job State server that holds information regarding your job and it's associated items.
+![steve][docs/logo.svg]
+
+Steve is a Job state server that holds information regarding your job and it's associated items.
 
 ## Modules
 There are 3 modules that are part of the project
