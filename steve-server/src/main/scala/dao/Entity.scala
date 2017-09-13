@@ -59,7 +59,7 @@ class Jobs @Inject()(db: Database) extends TableQuery(new JobTable(_)) {
 
   def update(updatedJob: Job): Future[Int] = {
     db.run {
-      this.filter(_.id === updatedJob.id).update(updatedJob)
+      this.filter(_.id === updatedJob.id).update(updatedJob.copy(updatedAt = Some(new Date())))
     }
   }
 
