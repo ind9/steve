@@ -17,4 +17,3 @@ datasource:
   user: indix
   password: indix123
   numThreads: 10
-

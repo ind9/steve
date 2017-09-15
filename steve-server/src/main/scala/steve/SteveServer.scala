@@ -4,6 +4,7 @@ import com.datasift.dropwizard.scala.ScalaApplication
 import com.google.inject.Stage
 import com.hubspot.dropwizard.guice.GuiceBundle
 import com.typesafe.config.ConfigFactory
+import health.SteveHealthCheck
 import io.dropwizard.setup.{Bootstrap, Environment}
 import org.flywaydb.core.Flyway
 
@@ -24,6 +25,7 @@ object SteveServer extends ScalaApplication[SteveConfiguration] {
   }
 
   override def run(configuration: SteveConfiguration, environment: Environment): Unit = {
+    environment.healthChecks().register("steve", new SteveHealthCheck)
     environment.jersey().setUrlPattern("/*")
   }
 }
