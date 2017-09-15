@@ -31,8 +31,6 @@ class SteveModule extends AbstractModule {
 class DatabaseProvider @Inject()(configuration: SteveConfiguration) extends Provider[slick.jdbc.JdbcBackend.Database] {
 
   private val db = {
-    println(configuration.datasource)
-
     slick.jdbc.JdbcBackend.Database.forConfig("steveDatasource")
   }
 
