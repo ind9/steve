@@ -4,7 +4,7 @@ sbt compile test
 
 sbt dist
 
-cd steve-service
+cd steve-server
 
 rm -rf dist
 
