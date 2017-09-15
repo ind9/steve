@@ -12,7 +12,7 @@ server:
 datasource:
   clazz: org.postgresql.ds.PGSimpleDataSource
   serverName: ${DB_HOST:-localhost}
-  portNumber: ${DB_HOST:-5432}
+  portNumber: ${DB_PORT:-5432}
   databaseName: ${DB_NAME:-steve}
   user: ${DB_USERNAME:-indix}
   password: ${DB_PASSWORD:-indix123}
