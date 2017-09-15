@@ -17,7 +17,7 @@ object SteveServer extends ScalaApplication[SteveConfiguration] {
 
   override def init(bootstrap: Bootstrap[SteveConfiguration]): Unit = {
     val flyway = new Flyway()
-    val dbConfig = ConfigFactory.load().getConfig("steveDatasource.properties")
+    val dbConfig = ConfigFactory.load().getConfig("steveDatasource.properties").resolve()
     val jdbcURL = s"jdbc:postgresql://${dbConfig.getString("serverName")}:${dbConfig.getString("portNumber")}/${dbConfig.getString("databaseName")}"
     flyway.setDataSource(jdbcURL, dbConfig.getString("user"), dbConfig.getString("password"))
     flyway.migrate()
