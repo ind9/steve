@@ -24,8 +24,9 @@
   },
   "env": {
     "DB_HOST": "{{ .Env.DB_HOST }}",
-    "DB_USER_PWD": "{{ .Env.DB_USER_PWD }}",
-    "DB_USER_NAME": "{{ .Env.DB_USER_NAME }}"
+    "DB_NAME": "{{ .Env.DB_NAME }}",
+    "DB_USERNAME": "{{ .Env.DB_USERNAME }}",
+    "DB_PASSWORD": "{{ .Env.DB_PASSWORD }}"
   },
   "healthChecks": [{
     "protocol": "HTTP",
