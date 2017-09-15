@@ -11,9 +11,9 @@ server:
 
 datasource:
   clazz: org.postgresql.ds.PGSimpleDataSource
-  serverName: localhost
-  portNumber: 5432
-  databaseName: steve
-  user: indix
-  password: indix123
-  numThreads: 10
+  serverName: ${DB_HOST:-localhost}
+  portNumber: ${DB_HOST:-5432}
+  databaseName: ${DB_NAME:-steve}
+  user: ${DB_USERNAME:-indix}
+  password: ${DB_PASSWORD:-indix123}
+  numThreads: ${DB_NUM_THREADS:-25}
