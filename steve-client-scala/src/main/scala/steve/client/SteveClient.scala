@@ -45,6 +45,14 @@ class SteveClient(httpClient: BaseHttp, host: String) {
     jobInfo.get("rowsAffected")
   }
 
+  def getJobStats(jobId: UUID): Map[String, Int] = {
+    val response = httpClient(s"${host}/job/${jobId.toString}/stats")
+      .method("GET")
+      .asString
+    val jobStats = JsonUtils.fromJson[Map[String, Int]](response.body)
+    jobStats
+  }
+
   def addItem(item: Item): Option[String] = {
     val data = JsonUtils.toJson(item)
     val response = httpClient(s"${host}/item")

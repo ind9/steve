@@ -78,6 +78,21 @@ class SteveClientSpec extends FlatSpec {
     response should be(expectedResponse.get("rowsAffected"))
   }
 
+  "Client" should "get a item status distribution for a given Job ID" in {
+    val jobId = UUID.randomUUID
+    val dummyStats = Map("CRASHED" -> 1, "FINISHED" -> 7, "IN_PROGRESS" -> 2)
+    val dummyResponse = JsonUtils.toJson(dummyStats)
+
+    when {
+      mockHttp(s"${host}/job/${jobId.toString}/stats")
+        .method("GET")
+        .asString
+    }.thenReturn(HttpResponse[String](dummyResponse, 200, Map()))
+
+    val response = client.getJobStats(jobId)
+    response should be(dummyStats)
+  }
+
   "Client" should "create a new Item and return Item ID" in {
     val itemId = UUID.randomUUID
     val jobId = UUID.randomUUID
