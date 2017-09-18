@@ -7,7 +7,7 @@ import javax.ws.rs.core.Response.Status
 import javax.ws.rs.core.{MediaType, Response}
 
 import com.google.inject.Inject
-import dao.Jobs
+import dao.{Items, Jobs}
 import domain.Job
 import steve.SteveConfiguration
 
@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
 @Path("/job")
-class JobController @Inject()(steveConfiguration: SteveConfiguration, jobs: Jobs, implicit val ec: ExecutionContext) {
+class JobController @Inject()(steveConfiguration: SteveConfiguration, jobs: Jobs, items: Items, implicit val ec: ExecutionContext) {
 
   @PUT
   @Path("/")
@@ -57,6 +57,17 @@ class JobController @Inject()(steveConfiguration: SteveConfiguration, jobs: Jobs
     jobs.delete(jobId).onComplete {
       case Success(rowsDeleted) if rowsDeleted == 0 => res.resume(Response.status(Status.NOT_FOUND).entity(Map("id" -> jobId, "msg" -> "Not Found")).build())
       case Success(rowsDeleted) => res.resume(Response.status(Status.OK).entity(Map("id" -> jobId, "msg" -> s"Deleted", "rowsAffected" -> rowsDeleted)).build())
+      case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
+    }
+  }
+
+  @GET
+  @Path("/{id}/stats")
+  @Produces(Array(MediaType.APPLICATION_JSON))
+  def getJobStats(@PathParam("id") jobId: UUID, @Suspended res: AsyncResponse) = {
+    items.stats(jobId).onComplete {
+      case Success(None) => res.resume(Response.status(Status.NOT_FOUND).entity(Map("id" -> jobId, "msg" -> "Not Found")).build())
+      case Success(results: List[(String, Int)]) => res.resume(Response.status(Status.OK).entity(results.toMap).build())
       case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
     }
   }
