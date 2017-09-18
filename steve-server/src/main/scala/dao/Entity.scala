@@ -28,7 +28,7 @@ class ItemTable(tag: Tag) extends Table[Item](tag, Some("public"), "item") {
   def attributes = column[Map[String, String]]("attributes")
 
   protected val jobTableQuery = TableQuery[JobTable]
-  def jobForeignKey = foreignKey("JOB_ID_FK", jobId, jobTableQuery)(_.id)
+  def jobForeignKey = foreignKey("JOB_ID_FK", jobId, jobTableQuery)(_.id, onDelete=ForeignKeyAction.Cascade)
 
   def * = (id, jobId, status, createdAt, updatedAt, attributes) <> (Item.tupled, Item.unapply)
 }

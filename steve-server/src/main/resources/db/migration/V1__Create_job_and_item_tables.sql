@@ -9,7 +9,7 @@ create table "job" (
 
 create table "item" (
   "id" UUID PRIMARY KEY,
-  "job_id" UUID NOT NULL REFERENCES job(id),
+  "job_id" UUID NOT NULL REFERENCES job(id) ON DELETE CASCADE,
   "status" TEXT NOT NULL,
   "attributes" HSTORE NULL DEFAULT NULL,
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now(),
