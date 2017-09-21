@@ -22,7 +22,7 @@ class ItemController @Inject()(steveConfiguration: SteveConfiguration, items: It
   @Produces(Array(MediaType.APPLICATION_JSON))
   def createItem(item: Item, @Suspended res: AsyncResponse) = {
     val newItem: Item = item.copy(id = UUID.randomUUID, createdAt = new Date())
-    items.insert(List(newItem)).onComplete {
+    items.insert(newItem).onComplete {
       case Success(_) => res.resume(Response.status(Status.CREATED).entity(Map("id" -> newItem.id, "msg" -> "Created")).build())
       case Failure(error) => {error.printStackTrace(); res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())}
     }

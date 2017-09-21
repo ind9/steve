@@ -22,7 +22,7 @@ class JobController @Inject()(steveConfiguration: SteveConfiguration, jobs: Jobs
   @Produces(Array(MediaType.APPLICATION_JSON))
   def createJob(job: Job, @Suspended res: AsyncResponse) = {
     val newJob: Job = job.copy(id = UUID.randomUUID, createdAt = new Date())
-    jobs.insert(List(newJob)).onComplete {
+    jobs.insert(newJob).onComplete {
       case Success(_) => res.resume(Response.status(Status.CREATED).entity(Map("id" -> newJob.id, "msg" -> "Created")).build())
       case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
     }

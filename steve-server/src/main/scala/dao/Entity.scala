@@ -5,6 +5,8 @@ import java.util.{Date, UUID}
 import com.google.inject.{Inject, Singleton}
 import dao.StevePostgresProfile.api._
 import domain.{Item, Job}
+import slick.ast.BaseTypedType
+import slick.lifted.AbstractTable
 
 import scala.concurrent.Future
 
@@ -44,75 +46,77 @@ class ItemTable(tag: Tag) extends Table[Item](tag, Some("public"), "item") {
   def * = (id, jobId, status, createdAt, updatedAt, attributes) <> (Item.tupled, Item.unapply)
 }
 
-//object Jobs extends TableQuery(new JobTable(_)) {
-//  def byId(ids: Long*) = Jobs.filter(_.id inSetBind ids).map(t => t)
-//}
+abstract class GenericDAO[T <: AbstractTable[_], I: BaseTypedType](db: Database) {
 
-//abstract class AbstractDAO {
-// val db = Database.forConfig("steveDatasource")
-//}
+  type Id = I
 
-@Singleton
-class Jobs @Inject()(db: Database) extends TableQuery(new JobTable(_)) {
+  def table: TableQuery[T]
 
-  def insert(jobs: List[Job]) = try {
-    val toBeInserted = this ++= jobs
+  def getId(row: T): Rep[Id]
+
+  def insert(entity: T#TableElementType): Future[Int] = {
     db.run {
-      DBIO.seq(toBeInserted)
+      table += entity
     }
   }
 
-  def select(jobId: UUID): Future[Option[Job]] = {
+  def insert(entities: List[T#TableElementType]): Future[Option[Int]] = {
+    db.run{table ++= entities}
+  }
+
+  def select(id: Id): Future[Option[_]] = {
     db.run {
-      this.filter(_.id === jobId).result.headOption
+      table.filter(getId(_) === id).result.headOption
     }
   }
 
-  def update(updatedJob: Job): Future[Int] = {
+  private def buildDeleteAction(id: Id) = {
+    slickProfile.createDeleteActionExtensionMethods(
+      slickProfile.deleteCompiler.run(table.filter(getId(_) === id).toNode).tree, ()
+    )
+  }
+
+  def delete(id: Id): Future[Int] = {
+    val deleteAction = buildDeleteAction(id)
     db.run {
-      this.filter(_.id === updatedJob.id).update(updatedJob.copy(updatedAt = Some(new Date())))
+      deleteAction.delete
     }
   }
 
-  def delete(jobId: UUID): Future[Int] = {
-    db.run {
-      this.filter(_.id === jobId).delete
-    }
-  }
 }
 
 @Singleton
-class Items @Inject()(db: Database) extends TableQuery(new ItemTable(_)) {
+class Jobs @Inject()(db: Database) extends GenericDAO[JobTable,UUID](db) {
 
-  def insert(items: List[Item]) = try {
-    val toBeInserted = this ++= items
+  val table: TableQuery[JobTable] = TableQuery[JobTable]
+
+  override def getId(row: JobTable): Rep[UUID] = row.id
+
+  def update(updatedJob: Job): Future[Int] = {
     db.run {
-      DBIO.seq(toBeInserted)
+      table.filter(_.id === updatedJob.id).update(updatedJob.copy(updatedAt = Some(new Date())))
     }
   }
 
-  def select(itemId: UUID): Future[Option[Item]] = {
-    db.run {
-      this.filter(_.id === itemId).result.headOption
-    }
-  }
+}
+
+@Singleton
+class Items @Inject()(db: Database) extends GenericDAO[ItemTable,UUID](db) {
+
+  val table: TableQuery[ItemTable] = TableQuery[ItemTable]
+
+  override def getId(row: ItemTable): Rep[UUID] = row.id
 
   def update(updatedItem: Item): Future[Int] = {
     db.run {
-      this.filter(_.id === updatedItem.id).update(updatedItem)
-    }
-  }
-
-  def delete(itemId: UUID): Future[Int] = {
-    db.run {
-      this.filter(_.id === itemId).delete
+      table.filter(_.id === updatedItem.id).update(updatedItem.copy(updatedAt = Some(new Date())))
     }
   }
 
   // TODO refactor and move this to a nicer place.
   def stats(jobId: UUID): Future[_] = {
     db.run {
-      this.filter(_.jobId === jobId)
+      table.filter(_.jobId === jobId)
         .groupBy(_.status)
         .map {
           case (id, group) => (id, group.map(_.status).length)

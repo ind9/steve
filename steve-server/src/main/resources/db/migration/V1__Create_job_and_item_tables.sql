@@ -1,4 +1,4 @@
-create table "job" (
+create table if not exists "job" (
   "id" UUID PRIMARY KEY,
   "app_name" TEXT NOT NULL,
   "state" TEXT NOT NULL,
@@ -7,7 +7,7 @@ create table "job" (
   updated_at TIMESTAMP WITHOUT TIME ZONE NULL DEFAULT NULL
 );
 
-create table "item" (
+create table if not exists "item" (
   "id" UUID PRIMARY KEY,
   "job_id" UUID NOT NULL REFERENCES job(id) ON DELETE CASCADE,
   "status" TEXT NOT NULL,
