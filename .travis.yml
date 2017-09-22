@@ -1,8 +1,5 @@
 language: scala
 
-scala:
-- 2.12.3
-
 jdk: oraclejdk8
 
 sudo: false
@@ -32,6 +29,12 @@ before_deploy:
 deploy:
 - provider: script
   script: .travis/publish.sh
+  skip_cleanup: true
+  on:
+    repo: ind9/steve
+    branch: master
+    jdk: oraclejdk8
+
 
 notifications:
   slack:
