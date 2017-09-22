@@ -1,21 +1,49 @@
 language: scala
+
 scala:
-  - 2.10.6
-  - 2.11.11
-  - 2.12.3
+- 2.10.6
+- 2.11.11
+- 2.12.3
 
 jdk: oraclejdk8
 
-# Use container-based infrastructure
 sudo: false
 
 cache:
   directories:
-    - $HOME/.ivy2/cache
-    - $HOME/.sbt
+  - $HOME/.ivy2/cache
+  - $HOME/.sbt
 
 before_cache:
-  # Cleanup the cached directories to avoid unnecessary cache updates
-  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
-  - find $HOME/.sbt        -name "*.lock"               -print -delete
+- find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
+- find $HOME/.sbt        -name "*.lock"               -print -delete
 
+env:
+  matrix:
+  - secure: H7y6YfwdUASs3IuPZzaMRJyNnky6DNtcGYGxPqWJvWvM7ySi6n0f6zuZbNoVxJuojTmg0c/AMxwwzeFMibaETpTOtC4/9yoMI2/icTidqk+pE3pDAC28PVAw5OoTFpc3s8hQPnukgy7ZGSYV4EKCBI8VuyB768FGtQf/H5QRlg1qXGY6wkJ6VVgb98TcEIER1cCPiF9hzFcNoQfFPtQ+qqmCbRQn0t9TdGQFeJMgUfiNZ5aYIoa1p64ZL05yDWcblc6lX0ifVsfvF2Qb1M6s+/PQyth/JNelyOCV2asVWYAOKrhToqHqZdBJu2jNv+gdDdoUvPjagKiD8RMZtkd/0DaB/pzagTp6B7fy3WG0cLntWpHJvg+QM4Xe1l3fXBPGy68yoTqYwEBDf18p+3Ie3T/UdfugbFNdJ9vmIgaFeHzZZAu6xQqYgCNVeP60ZW7INCgXfNB8mpBbeydAX3lpxK2p103jPfcGroI3fGM+TyfMOKCF58K4RkR03SC2YbCnTRMSUXKAmnUS4hKGApA8TeNpQNZffqzSrcW7RuNEt20iQQ1bW3VM6i6rF93+P3NbcV7HtCnwKd7jjkAyLpqM3WBWThmtnumypslruQvvGMOI2/nTqllB3cAaI66PK7J0+7btzmyeE0XL0MP1b2dXBKsIasBIhNVxiO1xHJSCtuk=
+  - secure: Z3zox3Waf9QbIKf/CJfj51vq97TlJqlRQP8H68rI/L4qeaV4IS+wze+j4s80qOEEsJ1JzGd8t9jzXnwEUTcPM6Vs1uYdYI/SVZTVsUzVzcyDmPuvJmIwcmal+WsFkEEDkBAnCBQrqEJumtjBtsx/n7lGBzWsaH29EkiVKGd9vTuuEOfK/Tyc1YvfLk/iyYUseWBxToAskMAHBRdLaVoclHpRPgabdOHUWXEmOzKaR6NE0bRfOsaed+pscvIWesVLkqu7PoV8sqK1YjK+e8LykZHbYmyoZDB/wuA2FrPd0zcIn4Xks9Gj1zICfY/9WLC+1US0uktkFF4wOkE2ufWD6BpgP3MmeCXxkIvGh/x4SDXuxQlps5KKQUztcil6ZRD6XaUNU/i8gD78q2yoPJvMMFyCef1zoHPQNlugnAfWtXEh+o41wniCHm66LYYOknK23FZGT/eQBPQcWOK0fFysv8gtz2vCqHiiAROvpAmS8KzR4XejyszXw4rsYexUG1bwcSCvI8J4TYARkUMw8f2ZST5UTESURbaDkgA0lRGugKeovlH/ZnWORug+c8AVAdjKOx8Q8owv0ZPtF1DDwMCoeLGWXwygfXnXZG6VJKujhRt7W8pbxPxgSfm1GO/dzTXwf7Pdy97rEQ8yc7t/CNpX85xxk8Tnes+yR3DN3uutJck=
+  - secure: NObZyy1SSQm8+e6ECq85ZRTGMxyIJ5tOzAgwBDCkBzc+n1S0tgUO2AvyMFuuIoMmO3CGZT/aCMt43TOJLzAD5ye8N+IcJMJFABemnsy+a10J10VXG4z89EE9V284v17b3HB/FN3pcIOxg/8EQdS4p9+06aZ2yPmvgI+Bybavj377YK7MK2ToE+aIpsRagA6o5ZKzNB22wb2+LgTzAKk2ORgkFcWYWGnoC+XdHext8ZtwaAoZbftbrlpevjH3Ad+RU+jUZct0zuLWAzxWl39E92uRS2G11NppsZyOymSXFhwxELaRK+g5D9nVf3Xn9IijxsRiAQIYgKnydjSagD8AT4dpR6+bH+4IWoHdxwSa/EW43SU4zqH8UxefSgataCxHvoErxs4UsA20sxO3/PWgLOu19p/DC10d4FU+yIkKKgzREHXhgrXUu7V+2MExIRQ1PNQRKyzI4AtASQb7LvD3hboCaE9kZg6lBP/NHLpIc0DR2wzz1gWy3G1oQn5+In89qfoUOv5on4JHDdVKjtbLD9STXAAgDr5o5QIgUaTonVCh3iS4Y0yG5Z0RiRHjuPI8ZMvHGSCXjEUi7WSVb9WsA7lcqZWPKT4zz/8qKU7hvV2mWKDSpV5LnYPimPswZEvaajihk58UpwuwS1OsGFBl3Wh94Mnk2/6gb+PGp3LRnuA=
+  - secure: WqvoKfZS/421pUAFkb/MzBCzHT+HNmnE1i8hDgsOlm4ESIA48HYY1zDexsToc7PQxN5d6upA7VgVp19LBBNoDIRuoz5crnG2qqA/6+dzbDv+K8vmoEDKhnKWft5t3UPYWC/ajQWzkOXRdJctJDJrUp4H87dvuL9zxvO8Sq87/bN0cxUNjc7qvcCDfvyUsN/OAa39I55uvy9HkszWj3ebGa4fFaYwF2Z8HToyDFntOdI/yttZSSKnTuETabz021akMdD/jvm663JUoyEjl6pE5ReXyvuHoDLoGchMHTXWXXLMZraNzdAXc7NmfnpeIEwjlokznFuANwbdGusdl9++Pd0lQq4ak+8dXUrNuUm8nGYoDWKdiUNbO1JL6OsN9TTqEfTwHn4gwRo6piK9igRnQd51BSSWAq9n0lNNcF5IEiWaiFvgSgQq29EEGXbOqUzFWSfMz59lyf4nrIrEYyf9Xq4kNDyQhjPfowKLJJ54/YjZc2JY4TXqhsO8DPE3RFvqEjjBAOcKrydgUY6dpeJ9GTLJ1V8NKzn679rD+RI7Fkvft8IqhGqzxctw9zpxBrRh/c3quBz743p+BomMyM8smdG8H6Ob0s+dscz10eVgM4S7wYZB+06o+hzOXK9zLs5opPscWHTBXeBmOiJfJ1pK4ZLvAfK4h/CL4rnvqzYALTY=
+- BUILD_LABEL=1.0.${TRAVIS_BUILD_NUMBER}
+
+before_deploy:
+- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in secring.gpg.enc -out local.secring.gpg
+  -d
+- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in pubring.gpg.enc -out local.pubring.gpg
+  -d
+
+deploy:
+- provider: script
+  script: ./publish.sh
+  skip_cleanup: true
+  on:
+    tags: true
+    jdk: oraclejdk8
+    scala: 2.11.11
+
+notifications:
+  slack:
+    rooms:
+      secure: HQdcZwqDY9+vGW7N9YZ2tFeU50SgqrWEQefI/injWVcndkAL7U/TFOoFvyOdxPZA1sya3aKUyAfVVv7BzMdPUfas41LgYj+iSWAaidiwqrJMp3lkvvALoXId9IDrdWcbhqJ4F51dfO8ck6Jf0S9cXtXC8/dSunWJORdr9ycgkxs=
+    on_success: change
+    on_failure: always

@@ -4,6 +4,8 @@ import Dependencies._
 import sbt.Keys._
 import sbt.Package.ManifestAttributes
 
+val libVersion = sys.env.get("TRAVIS_TAG") orElse sys.env.get("BUILD_LABEL") getOrElse s"1.0.0-${System.currentTimeMillis / 1000}-SNAPSHOT"
+
 lazy val steve = Project(
   id = "steve",
   base = file("."),
@@ -41,6 +43,7 @@ lazy val steveScalaClient = (project in file("steve-client-scala"))
   .dependsOn(steveCore)
 
 lazy val commonSettings = Seq(
+  version := libVersion,
   organization := "com.indix",
   packageOptions := Seq(ManifestAttributes(("Built-By", InetAddress.getLocalHost.getHostName))),
   parallelExecution in This := false,
@@ -91,7 +94,9 @@ lazy val publishSettings = Seq(
 lazy val sonatypePublishSettings = Seq(
   /* START - sonatype publish related settings */
   useGpg := true,
-  pgpPassphrase := Some(Array())
+  pgpSecretRing := file("local.secring.gpg"),
+  pgpPublicRing := file("local.pubring.gpg"),
+  pgpPassphrase := Some(sys.env.getOrElse("GPG_PASSPHRASE", "").toCharArray)
   /* END - sonatype publish related settings */
 )
 
