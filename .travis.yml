@@ -32,10 +32,6 @@ before_deploy:
 deploy:
 - provider: script
   script: .travis/publish.sh
-  on:
-    tags: true
-    jdk: oraclejdk8
-    scala: 2.12.3
 
 notifications:
   slack:
