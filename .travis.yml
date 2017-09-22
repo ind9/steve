@@ -1,8 +1,6 @@
 language: scala
 
 scala:
-- 2.10.6
-- 2.11.11
 - 2.12.3
 
 jdk: oraclejdk8
@@ -28,8 +26,8 @@ env:
 
 
 before_deploy:
-- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in secring.gpg.enc -out local.secring.gpg -d
-- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in pubring.gpg.enc -out local.pubring.gpg -d
+- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in .travis/secring.gpg.enc -out local.secring.gpg -d
+- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in .travis/pubring.gpg.enc -out local.pubring.gpg -d
 
 deploy:
 - provider: script
@@ -38,7 +36,7 @@ deploy:
   on:
     tags: true
     jdk: oraclejdk8
-    scala: 2.11.11
+    scala: 2.12.3
 
 notifications:
   slack:
