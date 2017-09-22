@@ -2,7 +2,8 @@
 
 set -x -e
 
-sbt +publishSigned         #This will sign and upload your artifact to Sonatype’s staging repository.
-sbt sonatypeRelease      #This promotes the release to be ready for syncing to Maven Central.
+sbt 'project steveCore' +publishSigned
+sbt 'project steveScalaClient' +publishSigned
+sbt sonatypeReleaseAll
 
 echo "Released"
