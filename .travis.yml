@@ -1,4 +1,6 @@
 language: scala
+scala:
+- 2.12.3
 
 jdk: oraclejdk8
 
@@ -34,6 +36,7 @@ deploy:
     repo: ind9/steve
     branch: master
     jdk: oraclejdk8
+    scala: 2.12.3
 
 
 notifications:
