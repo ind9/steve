@@ -93,7 +93,7 @@ lazy val publishSettings = Seq(
 
 lazy val sonatypePublishSettings = Seq(
   /* START - sonatype publish related settings */
-  useGpg := true,
+  useGpg := false,
   pgpSecretRing := file("local.secring.gpg"),
   pgpPublicRing := file("local.pubring.gpg"),
   pgpPassphrase := Some(sys.env.getOrElse("GPG_PASSPHRASE", "").toCharArray)
