@@ -1,3 +1,4 @@
+import org.apache.commons.lang3.StringUtils
 import sbt._
 
 object Dependencies {
@@ -26,4 +27,8 @@ object Dependencies {
   lazy val coreDependencies = Seq(fasterxmlScala) ++ testDependencies
   lazy val serverDependencies = Seq(dropwizard, guice, postgres, slick, slickHikaricp, slickPg, typesafe, flyway) ++ testDependencies
   lazy val clientDependencies = Seq(scalajHttp, fasterxmlScala) ++ testDependencies
+}
+
+object BuildUtils {
+  def env(key: String) = sys.env.get(key).filter(StringUtils.isNotBlank)
 }

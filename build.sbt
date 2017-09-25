@@ -1,10 +1,11 @@
 import java.net.InetAddress
 
+import BuildUtils.env
 import Dependencies._
 import sbt.Keys._
 import sbt.Package.ManifestAttributes
 
-val libVersion = sys.env.get("TRAVIS_TAG") orElse sys.env.get("BUILD_LABEL") getOrElse s"1.0.0-${System.currentTimeMillis / 1000}-SNAPSHOT"
+val libVersion = env("TRAVIS_TAG") orElse env("BUILD_LABEL") getOrElse s"1.0.0-${System.currentTimeMillis / 1000}-SNAPSHOT"
 
 lazy val steve = Project(
   id = "steve",
