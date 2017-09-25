@@ -48,7 +48,7 @@ lazy val commonSettings = Seq(
   packageOptions := Seq(ManifestAttributes(("Built-By", InetAddress.getLocalHost.getHostName))),
   parallelExecution in This := false,
   scalaVersion := "2.12.3",
-  crossScalaVersions := Seq("2.10.6", "2.11.11", "2.12.3"),
+  crossScalaVersions := Seq("2.11.11"),
   organizationName := "Indix",
   organizationHomepage := Some(url("http://www.indix.com")),
   scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
@@ -93,7 +93,7 @@ lazy val publishSettings = Seq(
 
 lazy val sonatypePublishSettings = Seq(
   /* START - sonatype publish related settings */
-  useGpg := true,
+  useGpg := false,
   pgpSecretRing := file("local.secring.gpg"),
   pgpPublicRing := file("local.pubring.gpg"),
   pgpPassphrase := Some(sys.env.getOrElse("GPG_PASSPHRASE", "").toCharArray)

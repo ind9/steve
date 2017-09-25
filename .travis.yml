@@ -1,8 +1,5 @@
 language: scala
-
 scala:
-- 2.10.6
-- 2.11.11
 - 2.12.3
 
 jdk: oraclejdk8
@@ -19,17 +16,19 @@ before_cache:
 - find $HOME/.sbt        -name "*.lock"               -print -delete
 
 before_deploy:
-- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in secring.gpg.enc -out local.secring.gpg -d
-- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in pubring.gpg.enc -out local.pubring.gpg -d
+- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in .travis/secring.gpg.enc -out local.secring.gpg -d
+- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in .travis/pubring.gpg.enc -out local.pubring.gpg -d
 
 deploy:
 - provider: script
-  script: ./publish.sh
+  script: .travis/publish.sh
   skip_cleanup: true
   on:
-    tags: true
+    repo: ind9/steve
+    branch: master
     jdk: oraclejdk8
-    scala: 2.11.11
+    scala: 2.12.3
+
 
 notifications:
   slack:
