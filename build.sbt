@@ -7,12 +7,11 @@ import sbt.Package.ManifestAttributes
 
 val libVersion = env("TRAVIS_TAG") orElse env("BUILD_LABEL") getOrElse s"1.0.0-${System.currentTimeMillis / 1000}-SNAPSHOT"
 
-lazy val steve = Project(
-  id = "steve",
-  base = file("."),
-  //  settings = defaultSettings,
-  aggregate = Seq(steveCore, steveServer, steveScalaClient)
-)
+lazy val steve = (project in file("."))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "steve"
+  ).aggregate(steveCore, steveServer, steveScalaClient)
 
 lazy val steveCore = (project in file("steve-core"))
   .settings(
@@ -49,7 +48,7 @@ lazy val commonSettings = Seq(
   packageOptions := Seq(ManifestAttributes(("Built-By", InetAddress.getLocalHost.getHostName))),
   parallelExecution in This := false,
   scalaVersion := "2.12.3",
-  crossScalaVersions := Seq("2.11.11"),
+  crossScalaVersions := Seq("2.12.3", "2.11.11"),
   organizationName := "Indix",
   organizationHomepage := Some(url("http://www.indix.com")),
   scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
@@ -60,8 +59,9 @@ lazy val commonSettings = Seq(
 lazy val publishSettings = Seq(
   publishMavenStyle := true,
   publishArtifact in Test := false,
-  publishArtifact in (Compile, packageDoc) := true,
-  publishArtifact in (Compile, packageSrc) := true,
+  publishArtifact in(Compile, packageDoc) := true,
+  publishArtifact in(Compile, packageSrc) := true,
+  pomIncludeRepository := { _ => false },
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
@@ -79,8 +79,8 @@ lazy val publishSettings = Seq(
         </license>
       </licenses>
       <scm>
-        <url>git@github.com:indix/steve.git</url>
-        <connection>scm:git:git@github.com:indix/steve.git</connection>
+        <url>git@github.com:ind9/steve.git</url>
+        <connection>scm:git:git@github.com:ind9/steve.git</connection>
       </scm>
       <developers>
         <developer>
@@ -96,25 +96,29 @@ lazy val sonatypePublishSettings = Seq(
   useGpg := false,
   pgpSecretRing := file("local.secring.gpg"),
   pgpPublicRing := file("local.pubring.gpg"),
-  pgpPassphrase := Some(sys.env.getOrElse("GPG_PASSPHRASE", "").toCharArray)
+  pgpPassphrase := Some(sys.env.getOrElse("GPG_PASSPHRASE", "").toCharArray),
+  credentials += Credentials("Sonatype Nexus Repository Manager",
+    "oss.sonatype.org",
+    System.getenv("SONATYPE_USERNAME"),
+    System.getenv("SONATYPE_PASSWORD"))
   /* END - sonatype publish related settings */
 )
 
 lazy val steveAssembly = Seq(
   assemblyMergeStrategy in assembly := {
-    case PathList(ps @ _*) if List("package-info.class", "plugin.properties", "mime.types").exists(ps.last.endsWith) =>
+    case PathList(ps@_*) if List("package-info.class", "plugin.properties", "mime.types").exists(ps.last.endsWith) =>
       MergeStrategy.first
     case "reference.conf" | "rootdoc.txt" =>
       MergeStrategy.concat
     case "LICENSE" | "LICENSE.txt" =>
       MergeStrategy.discard
-    case PathList("META-INF", xs @ _*) =>
+    case PathList("META-INF", xs@_*) =>
       xs map {
         _.toLowerCase
       } match {
         case ("manifest.mf" :: Nil) =>
           MergeStrategy.discard
-        case ps @ (x :: xs) if ps.last.endsWith(".sf") || ps.last.endsWith(".dsa") || ps.last.endsWith(".rsa") =>
+        case ps@(x :: xs) if ps.last.endsWith(".sf") || ps.last.endsWith(".dsa") || ps.last.endsWith(".rsa") =>
           MergeStrategy.discard
         case ("log4j.properties" :: Nil) =>
           MergeStrategy.discard
