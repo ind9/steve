@@ -5,13 +5,13 @@ import utils.JsonUtils
 
 import scalaj.http.BaseHttp
 
-
 class SteveClient(httpClient: BaseHttp, host: String) {
   def addJob(appName: String, state: String, attributes: Map[String,String]): Option[String] = {
     val jsonInput = Map[String,Any]("appName" -> appName, "state" -> state, "attributes" -> attributes)
     val data = JsonUtils.toJson(jsonInput)
     val response = httpClient(s"$host/job")
       .postData(data)
+      .header("content-type", "application/json")
       .method("PUT")
       .asString
     val jobInfo = JsonUtils.fromJson[Map[String, String]](response.body)
@@ -32,6 +32,7 @@ class SteveClient(httpClient: BaseHttp, host: String) {
     val data = JsonUtils.toJson(job.copy(state = state))
     val response = httpClient(s"$host/job/${jobId.toString}")
       .postData(data)
+      .header("content-type", "application/json")
       .method("POST")
       .asString
     val jobInfo = JsonUtils.fromJson[Job](response.body)
@@ -59,6 +60,7 @@ class SteveClient(httpClient: BaseHttp, host: String) {
     val data = JsonUtils.toJson(jsonInput)
     val response = httpClient(s"$host/item")
       .postData(data)
+      .header("content-type", "application/json")
       .method("PUT")
       .asString
     val itemInfo = JsonUtils.fromJson[Map[String, String]](response.body)
@@ -79,6 +81,7 @@ class SteveClient(httpClient: BaseHttp, host: String) {
     val data = JsonUtils.toJson(item.copy(status = status))
     val response = httpClient(s"$host/item/$itemId")
       .postData(data)
+      .header("content-type", "application/json")
       .method("POST")
       .asString
     val itemInfo = JsonUtils.fromJson[Item](response.body)

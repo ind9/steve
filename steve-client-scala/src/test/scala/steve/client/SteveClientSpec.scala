@@ -23,6 +23,7 @@ class SteveClientSpec extends FlatSpec {
     when {
       mockHttp(s"$host/job")
         .postData(JsonUtils.toJson(job))
+        .header("content-type", "application/json")
         .method("PUT")
         .asString
     }.thenReturn(HttpResponse[String](jsonResponse, 201, Map()))
@@ -62,6 +63,7 @@ class SteveClientSpec extends FlatSpec {
     when {
       mockHttp(s"$host/job/${jobId.toString}")
         .postData(JsonUtils.toJson(dummyJobForPost))
+        .header("content-type", "application/json")
         .method("POST")
         .asString
     }.thenReturn(HttpResponse[String](dummyResponseForPost, 200, Map()))
@@ -110,6 +112,7 @@ class SteveClientSpec extends FlatSpec {
     when {
       mockHttp(s"$host/item")
         .postData(JsonUtils.toJson(item))
+        .header("content-type", "application/json")
         .method("PUT")
         .asString
     }.thenReturn(HttpResponse[String](jsonResponse, 201, Map()))
@@ -151,6 +154,7 @@ class SteveClientSpec extends FlatSpec {
     when {
       mockHttp(s"$host/item/${itemId.toString}")
         .postData(JsonUtils.toJson(dummyItemForPost))
+        .header("content-type", "application/json")
         .method("POST")
         .asString
     }.thenReturn(HttpResponse[String](dummyResponseForPost, 200, Map()))
