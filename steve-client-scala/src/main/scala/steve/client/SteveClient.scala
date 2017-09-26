@@ -1,7 +1,5 @@
 package steve.client
 
-import java.util.UUID
-
 import domain.{Item, Job}
 import utils.JsonUtils
 
@@ -9,9 +7,10 @@ import scalaj.http.BaseHttp
 
 
 class SteveClient(httpClient: BaseHttp, host: String) {
-  def addJob(job: Job): Option[String] = {
-    val data = JsonUtils.toJson(job)
-    val response = httpClient(s"${host}/job")
+  def addJob(appName: String, state: String, attributes: Map[String,String]): Option[String] = {
+    val jsonInput = Map[String,Any]("appName" -> appName, "state" -> state, "attributes" -> attributes)
+    val data = JsonUtils.toJson(jsonInput)
+    val response = httpClient(s"$host/job")
       .postData(data)
       .method("PUT")
       .asString
@@ -19,17 +18,19 @@ class SteveClient(httpClient: BaseHttp, host: String) {
     jobInfo.get("id")
   }
 
-  def getJob(jobId: UUID): Job = {
-    val response = httpClient(s"${host}/job/${jobId.toString}")
+  def getJob(jobId: String): Job = {
+    val response = httpClient(s"$host/job/$jobId")
       .method("GET")
       .asString
     val jobInfo = JsonUtils.fromJson[Job](response.body)
     jobInfo
   }
 
-  def updateJob(jobId: UUID, updatedJob: Job): Job = {
-    val data = JsonUtils.toJson(updatedJob)
-    val response = httpClient(s"${host}/job/${jobId.toString}")
+  def updateJobState(jobId: String, state: String): Job = {
+    //TODO - Change the below to in-place updates
+    val job = getJob(jobId)
+    val data = JsonUtils.toJson(job.copy(state = state))
+    val response = httpClient(s"$host/job/${jobId.toString}")
       .postData(data)
       .method("POST")
       .asString
@@ -37,25 +38,26 @@ class SteveClient(httpClient: BaseHttp, host: String) {
     jobInfo
   }
 
-  def deleteJob(jobId: UUID): Option[String] = {
-    val response = httpClient(s"${host}/job/${jobId.toString}")
+  def deleteJob(jobId: String): Option[String] = {
+    val response = httpClient(s"$host/job/$jobId")
       .method("DELETE")
       .asString
     val jobInfo = JsonUtils.fromJson[Map[String, String]](response.body)
     jobInfo.get("rowsAffected")
   }
 
-  def getJobStats(jobId: UUID): Map[String, Int] = {
-    val response = httpClient(s"${host}/job/${jobId.toString}/stats")
+  def getJobStats(jobId: String): Map[String, Int] = {
+    val response = httpClient(s"$host/job/$jobId/stats")
       .method("GET")
       .asString
     val jobStats = JsonUtils.fromJson[Map[String, Int]](response.body)
     jobStats
   }
 
-  def addItem(item: Item): Option[String] = {
-    val data = JsonUtils.toJson(item)
-    val response = httpClient(s"${host}/item")
+  def addItem(jobId: String, status: String, attributes: Map[String,String]): Option[String] = {
+    val jsonInput = Map[String,Any]("jobId" -> jobId, "status" -> status, "attributes" -> attributes)
+    val data = JsonUtils.toJson(jsonInput)
+    val response = httpClient(s"$host/item")
       .postData(data)
       .method("PUT")
       .asString
@@ -63,17 +65,19 @@ class SteveClient(httpClient: BaseHttp, host: String) {
     itemInfo.get("id")
   }
 
-  def getItem(itemId: UUID): Item = {
-    val response = httpClient(s"${host}/item/${itemId.toString}")
+  def getItem(itemId: String): Item = {
+    val response = httpClient(s"$host/item/$itemId")
       .method("GET")
       .asString
     val itemInfo = JsonUtils.fromJson[Item](response.body)
     itemInfo
   }
 
-  def updateItem(itemId: UUID, updatedItem: Item): Item = {
-    val data = JsonUtils.toJson(updatedItem)
-    val response = httpClient(s"${host}/item/${itemId.toString}")
+  def updateItemStatus(itemId: String, status: String): Item = {
+    //TODO - Change the below to in-place updates
+    val item = getItem(itemId)
+    val data = JsonUtils.toJson(item.copy(status = status))
+    val response = httpClient(s"$host/item/$itemId")
       .postData(data)
       .method("POST")
       .asString
@@ -81,8 +85,8 @@ class SteveClient(httpClient: BaseHttp, host: String) {
     itemInfo
   }
 
-  def deleteItem(itemId: UUID): Option[String] = {
-    val response = httpClient(s"${host}/item/${itemId.toString}")
+  def deleteItem(itemId: String): Option[String] = {
+    val response = httpClient(s"$host/item/$itemId")
       .method("DELETE")
       .asString
     val itemInfo = JsonUtils.fromJson[Map[String, String]](response.body)
