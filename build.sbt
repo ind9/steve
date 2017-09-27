@@ -53,7 +53,12 @@ lazy val commonSettings = Seq(
   organizationHomepage := Some(url("http://www.indix.com")),
   scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
   javacOptions ++= Seq("-Xlint:deprecation", "-source", "1.7"),
-  resolvers += Resolver.sonatypeRepo("releases")
+  resolvers += Resolver.mavenLocal,
+  resolvers += Resolver.sonatypeRepo("releases"),
+  test in Test := {
+    dumpLicenseReport.value
+    (test in Test).value
+  }
 )
 
 lazy val publishSettings = Seq(
