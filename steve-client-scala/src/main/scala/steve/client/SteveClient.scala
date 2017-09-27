@@ -17,6 +17,9 @@ object ItemBatch {
 }
 
 class SteveClient(httpClient: BaseHttp, host: String) {
+  val connectionTimeoutInMillis = 10000
+  val readTimeoutInMillis = 30000
+
   def addJob(appName: String, state: String, attributes: Map[String,String]): Option[String] = {
     val jsonInput = Map[String,Any]("appName" -> appName, "state" -> state, "attributes" -> attributes)
     val data = JsonUtils.toJson(jsonInput)
@@ -24,6 +27,7 @@ class SteveClient(httpClient: BaseHttp, host: String) {
       .postData(data)
       .header("content-type", "application/json")
       .method("PUT")
+      .timeout(connTimeoutMs = connectionTimeoutInMillis,readTimeoutMs = readTimeoutInMillis)
       .asString
     val jobInfo = JsonUtils.fromJson[Map[String, String]](response.body)
     jobInfo.get("id")
@@ -32,6 +36,7 @@ class SteveClient(httpClient: BaseHttp, host: String) {
   def getJob(jobId: String): Job = {
     val response = httpClient(s"$host/job/$jobId")
       .method("GET")
+      .timeout(connTimeoutMs = connectionTimeoutInMillis,readTimeoutMs = readTimeoutInMillis)
       .asString
     val jobInfo = JsonUtils.fromJson[Job](response.body)
     jobInfo
@@ -45,6 +50,7 @@ class SteveClient(httpClient: BaseHttp, host: String) {
       .postData(data)
       .header("content-type", "application/json")
       .method("POST")
+      .timeout(connTimeoutMs = connectionTimeoutInMillis,readTimeoutMs = readTimeoutInMillis)
       .asString
     val jobInfo = JsonUtils.fromJson[Job](response.body)
     jobInfo
@@ -53,6 +59,7 @@ class SteveClient(httpClient: BaseHttp, host: String) {
   def deleteJob(jobId: String): Option[String] = {
     val response = httpClient(s"$host/job/$jobId")
       .method("DELETE")
+      .timeout(connTimeoutMs = connectionTimeoutInMillis,readTimeoutMs = readTimeoutInMillis)
       .asString
     val jobInfo = JsonUtils.fromJson[Map[String, String]](response.body)
     jobInfo.get("rowsAffected")
@@ -61,6 +68,7 @@ class SteveClient(httpClient: BaseHttp, host: String) {
   def getJobStats(jobId: String): Map[String, Int] = {
     val response = httpClient(s"$host/job/$jobId/stats")
       .method("GET")
+      .timeout(connTimeoutMs = connectionTimeoutInMillis,readTimeoutMs = readTimeoutInMillis)
       .asString
     val jobStats = JsonUtils.fromJson[Map[String, Int]](response.body)
     jobStats
@@ -73,6 +81,7 @@ class SteveClient(httpClient: BaseHttp, host: String) {
       .postData(data)
       .header("content-type", "application/json")
       .method("PUT")
+      .timeout(connTimeoutMs = connectionTimeoutInMillis,readTimeoutMs = readTimeoutInMillis)
       .asString
     val itemInfo = JsonUtils.fromJson[Map[String, String]](response.body)
     itemInfo.get("id")
@@ -84,6 +93,7 @@ class SteveClient(httpClient: BaseHttp, host: String) {
       .postData(data)
       .header("content-type", "application/json")
       .method("PUT")
+      .timeout(connTimeoutMs = connectionTimeoutInMillis,readTimeoutMs = readTimeoutInMillis)
       .asString
     response.is2xx
   }
@@ -91,6 +101,7 @@ class SteveClient(httpClient: BaseHttp, host: String) {
   def getItem(itemId: String): Item = {
     val response = httpClient(s"$host/item/$itemId")
       .method("GET")
+      .timeout(connTimeoutMs = connectionTimeoutInMillis,readTimeoutMs = readTimeoutInMillis)
       .asString
     val itemInfo = JsonUtils.fromJson[Item](response.body)
     itemInfo
@@ -104,6 +115,7 @@ class SteveClient(httpClient: BaseHttp, host: String) {
       .postData(data)
       .header("content-type", "application/json")
       .method("POST")
+      .timeout(connTimeoutMs = connectionTimeoutInMillis,readTimeoutMs = readTimeoutInMillis)
       .asString
     val itemInfo = JsonUtils.fromJson[Item](response.body)
     itemInfo
@@ -112,6 +124,7 @@ class SteveClient(httpClient: BaseHttp, host: String) {
   def deleteItem(itemId: String): Option[String] = {
     val response = httpClient(s"$host/item/$itemId")
       .method("DELETE")
+      .timeout(connTimeoutMs = connectionTimeoutInMillis,readTimeoutMs = readTimeoutInMillis)
       .asString
     val itemInfo = JsonUtils.fromJson[Map[String, String]](response.body)
     itemInfo.get("rowsAffected")
