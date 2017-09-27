@@ -28,6 +28,17 @@ class ItemController @Inject()(steveConfiguration: SteveConfiguration, items: It
     }
   }
 
+  @PUT
+  @Path("/bulk")
+  @Produces(Array(MediaType.APPLICATION_JSON))
+  def createItems(itemList: List[Item], @Suspended res: AsyncResponse) = {
+    val newItems = itemList.map(item => item.copy(id = UUID.randomUUID, createdAt = new Date()))
+    items.insert(newItems).onComplete {
+      case Success(_) => res.resume(Response.status(Status.CREATED).entity(Map("msg" -> "Created")).build())
+      case Failure(error) => {error.printStackTrace(); res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())}
+    }
+  }
+
   @GET
   @Path("/{id}")
   @Produces(Array(MediaType.APPLICATION_JSON))

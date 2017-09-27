@@ -5,6 +5,17 @@ import utils.JsonUtils
 
 import scalaj.http.BaseHttp
 
+case class ItemBatch(items: List[Map[String, Any]]) {
+  def +(another: ItemBatch) = ItemBatch(items ++ another.items)
+}
+
+object ItemBatch {
+  def apply(jobId: String, status: String, attributes: Map[String,String]): ItemBatch = {
+    ItemBatch(List(Map[String,Any]("jobId" -> jobId, "status" -> status, "attributes" -> attributes)))
+  }
+
+}
+
 class SteveClient(httpClient: BaseHttp, host: String) {
   def addJob(appName: String, state: String, attributes: Map[String,String]): Option[String] = {
     val jsonInput = Map[String,Any]("appName" -> appName, "state" -> state, "attributes" -> attributes)
@@ -65,6 +76,16 @@ class SteveClient(httpClient: BaseHttp, host: String) {
       .asString
     val itemInfo = JsonUtils.fromJson[Map[String, String]](response.body)
     itemInfo.get("id")
+  }
+
+  def addItems(batch: ItemBatch): Boolean = {
+    val data = JsonUtils.toJson(batch.items)
+    val response = httpClient(s"$host/item/bulk")
+      .postData(data)
+      .header("content-type", "application/json")
+      .method("PUT")
+      .asString
+    response.is2xx
   }
 
   def getItem(itemId: String): Item = {
