@@ -1,7 +1,7 @@
 package steve.client
 
 import java.util.{Date, UUID}
-
+import org.mockito.Matchers._
 import domain.{Item, Job}
 import org.mockito.Mockito._
 import org.scalatest.FlatSpec
@@ -25,6 +25,7 @@ class SteveClientSpec extends FlatSpec {
         .postData(JsonUtils.toJson(job))
         .header("content-type", "application/json")
         .method("PUT")
+        .timeout(anyInt(),anyInt())
         .asString
     }.thenReturn(HttpResponse[String](jsonResponse, 201, Map()))
 
@@ -40,6 +41,7 @@ class SteveClientSpec extends FlatSpec {
     when {
       mockHttp(s"$host/job/${jobId.toString}")
         .method("GET")
+        .timeout(anyInt(),anyInt())
         .asString
     }.thenReturn(HttpResponse[String](dummyResponse, 200, Map()))
 
@@ -57,6 +59,7 @@ class SteveClientSpec extends FlatSpec {
     when {
       mockHttp(s"$host/job/${jobId.toString}")
         .method("GET")
+        .timeout(anyInt(),anyInt())
         .asString
     }.thenReturn(HttpResponse[String](dummyResponseForGet, 200, Map()))
 
@@ -65,6 +68,7 @@ class SteveClientSpec extends FlatSpec {
         .postData(JsonUtils.toJson(dummyJobForPost))
         .header("content-type", "application/json")
         .method("POST")
+        .timeout(anyInt(),anyInt())
         .asString
     }.thenReturn(HttpResponse[String](dummyResponseForPost, 200, Map()))
 
@@ -80,6 +84,7 @@ class SteveClientSpec extends FlatSpec {
     when {
       mockHttp(s"$host/job/${jobId.toString}")
         .method("DELETE")
+        .timeout(anyInt(),anyInt())
         .asString
     }.thenReturn(HttpResponse[String](jsonResponse, 200, Map()))
 
@@ -95,6 +100,7 @@ class SteveClientSpec extends FlatSpec {
     when {
       mockHttp(s"$host/job/${jobId.toString}/stats")
         .method("GET")
+        .timeout(anyInt(),anyInt())
         .asString
     }.thenReturn(HttpResponse[String](dummyResponse, 200, Map()))
 
@@ -114,6 +120,7 @@ class SteveClientSpec extends FlatSpec {
         .postData(JsonUtils.toJson(item))
         .header("content-type", "application/json")
         .method("PUT")
+        .timeout(anyInt(),anyInt())
         .asString
     }.thenReturn(HttpResponse[String](jsonResponse, 201, Map()))
 
@@ -130,6 +137,7 @@ class SteveClientSpec extends FlatSpec {
     when {
       mockHttp(s"$host/item/${itemId.toString}")
         .method("GET")
+        .timeout(anyInt(),anyInt())
         .asString
     }.thenReturn(HttpResponse[String](dummyResponse, 200, Map()))
 
@@ -148,6 +156,7 @@ class SteveClientSpec extends FlatSpec {
     when {
       mockHttp(s"$host/item/${itemId.toString}")
         .method("GET")
+        .timeout(anyInt(),anyInt())
         .asString
     }.thenReturn(HttpResponse[String](dummyResponseForGet, 200, Map()))
 
@@ -156,6 +165,7 @@ class SteveClientSpec extends FlatSpec {
         .postData(JsonUtils.toJson(dummyItemForPost))
         .header("content-type", "application/json")
         .method("POST")
+        .timeout(anyInt(),anyInt())
         .asString
     }.thenReturn(HttpResponse[String](dummyResponseForPost, 200, Map()))
 
@@ -171,6 +181,7 @@ class SteveClientSpec extends FlatSpec {
     when {
       mockHttp(s"$host/item/${itemId.toString}")
         .method("DELETE")
+        .timeout(anyInt(),anyInt())
         .asString
     }.thenReturn(HttpResponse[String](jsonResponse, 200, Map()))
 
