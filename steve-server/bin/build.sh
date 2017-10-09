@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+rm -rf target/universal
+
 sbt compile test
 
 sbt dist
