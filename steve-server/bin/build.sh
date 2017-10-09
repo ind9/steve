@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-rm -rf target/universal
+rm -rf steve-server/target/universal
 
 sbt compile test
 
