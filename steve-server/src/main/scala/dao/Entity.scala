@@ -119,6 +119,18 @@ class Items @Inject()(db: Database) extends GenericDAO[ItemTable,UUID](db) {
 
   override def getId(row: ItemTable): Rep[UUID] = row.id
 
+  def checkIfStatusNotPresent(jobId:UUID, status:String): Future[Boolean] = {
+    db.run {
+      table.filter(_.jobId === jobId).filterNot(_.status === status).exists.result
+    }
+  }
+
+  def checkIfStatusPresent(jobId:UUID, status:String): Future[Boolean] = {
+    db.run {
+      table.filter(_.jobId === jobId).filter(_.status === status).exists.result
+    }
+  }
+
   def update(updatedItem: Item): Future[Int] = {
     db.run {
       table.filter(_.id === updatedItem.id).update(updatedItem.copy(updatedAt = Some(new Date())))

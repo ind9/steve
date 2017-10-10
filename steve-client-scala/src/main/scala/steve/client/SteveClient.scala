@@ -5,6 +5,9 @@ import utils.JsonUtils
 
 import scalaj.http.BaseHttp
 
+case class ClientException(private val message: String = "",
+                           private val cause: Throwable = None.orNull)
+  extends Exception(message, cause)
 case class ItemBatch(items: List[Map[String, Any]]) {
   def +(another: ItemBatch) = ItemBatch(items ++ another.items)
 }
@@ -16,6 +19,7 @@ object ItemBatch {
 
 }
 
+//TODO: Handle retries in the client logic
 class SteveClient(httpClient: BaseHttp, host: String) {
   val connectionTimeoutInMillis = 10000
   val readTimeoutInMillis = 30000
@@ -109,6 +113,28 @@ class SteveClient(httpClient: BaseHttp, host: String) {
       .asString
     val itemInfo = JsonUtils.fromJson[Item](response.body)
     itemInfo
+  }
+
+  private def checkItemByStatus(qpString: String) = {
+    val response = httpClient(s"$host/item/status?$qpString")
+      .method("HEAD")
+      .timeout(connTimeoutMs = connectionTimeoutInMillis,readTimeoutMs = readTimeoutInMillis)
+      .asString
+    if(response.is2xx)
+      true
+    else if(response.is4xx)
+      false
+    else
+      throw ClientException(response.toString)
+  }
+
+  def checkIfItemsWithStatus(jobId: String, status: String) = {
+    checkItemByStatus(s"jobId=$jobId&status=$status")
+  }
+
+  def checkIfItemsWithoutStatus(jobId: String, status: String) = {
+    //NOTE: There's a negation(`!`) operator on the status value
+    checkItemByStatus(s"jobId=$jobId&status=!$status")
   }
 
   def updateItemStatus(itemId: String, status: String): Boolean = {

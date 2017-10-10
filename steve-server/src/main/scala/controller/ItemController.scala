@@ -51,6 +51,30 @@ class ItemController @Inject()(steveConfiguration: SteveConfiguration, items: It
     }
   }
 
+  //TODO: Check if the below convention to handle not equals query is intuitive enough or is there a better alternative
+  @HEAD
+  @Path("/status")
+  @Produces(Array(MediaType.APPLICATION_JSON))
+  def checkItemStatus(@QueryParam("jobId") jobId: UUID, @QueryParam("status") status: String, @Suspended res: AsyncResponse) = {
+    if(status.startsWith("!")){
+      if(status.size < 2)
+        res.resume(Response.status(Status.BAD_REQUEST).entity(Map("msg"->"Invalid query param: status")).build())
+      items.checkIfStatusNotPresent(jobId, status.substring(1)).onComplete{
+        case Success(present) if present => res.resume(Response.status(Status.OK).build())
+        case Success(present) if !present => res.resume(Response.status(Status.NOT_FOUND).build())
+        case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
+      }
+    } else if(!status.isEmpty){
+      items.checkIfStatusPresent(jobId,status).onComplete{
+        case Success(present) if present => res.resume(Response.status(Status.OK).build())
+        case Success(present) if !present => res.resume(Response.status(Status.NOT_FOUND).build())
+        case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
+      }
+    } else {
+      res.resume(Response.status(Status.BAD_REQUEST).entity(Map("msg"->"Invalid query param: status")).build())
+    }
+  }
+
   @POST
   @Path("/{id}")
   @Produces(Array(MediaType.APPLICATION_JSON))
