@@ -33,7 +33,7 @@ class SteveClientSpec extends FlatSpec {
     response should be(expectedResponse.get("id"))
   }
 
-  it should "get a Job's details for a given Job ID" in {
+  it should "get the Job's details for a given Job ID" in {
     val jobId = UUID.randomUUID
     val dummyJob = Job(id = jobId, appName = "cannonball", state = "START", createdAt = new Date(), updatedAt = None, attributes = Map("test" -> "test"))
     val dummyResponse = JsonUtils.toJson(dummyJob)
@@ -49,34 +49,35 @@ class SteveClientSpec extends FlatSpec {
     response should be(dummyJob)
   }
 
-  it should "update a Job's state" in {
-    val jobId = UUID.randomUUID
-    val dummyJobForGet = Job(id = jobId, appName = "cannonball", state = "START", createdAt = new Date(), updatedAt = None, attributes = Map("test" -> "test"))
-    val dummyJobForPost = dummyJobForGet.copy(state = "UPDATE")
-    val dummyResponseForGet = JsonUtils.toJson(dummyJobForGet)
-    val dummyResponseForPost = JsonUtils.toJson(dummyJobForPost)
-
+  it should "get all the job ids for a given state" in {
+    val id1 = UUID.randomUUID()
+    val id2 = UUID.randomUUID()
+    val responseIds = JsonUtils.toJson(List(id1,id2))
     when {
-      mockHttp(s"$host/job/${jobId.toString}")
+      mockHttp(s"$host/job?state=NEW")
         .method("GET")
         .timeout(anyInt(),anyInt())
         .asString
-    }.thenReturn(HttpResponse[String](dummyResponseForGet, 200, Map()))
+    }.thenReturn(HttpResponse[String](responseIds, 200, Map()))
+    client.getJobIdsByState("NEW") should be(List(id1.toString,id2.toString))
+  }
 
+  it should "update a Job's state" in {
+    val jobId = UUID.randomUUID
     when {
-      mockHttp(s"$host/job/${jobId.toString}")
-        .postData(JsonUtils.toJson(dummyJobForPost))
+      mockHttp(s"$host/job/${jobId.toString}/state")
+        .postData("UPDATE")
         .header("content-type", "application/json")
         .method("POST")
         .timeout(anyInt(),anyInt())
         .asString
-    }.thenReturn(HttpResponse[String](dummyResponseForPost, 200, Map()))
+    }.thenReturn(HttpResponse[String](jobId.toString, 200, Map()))
 
     val response = client.updateJobState(jobId.toString, "UPDATE")
-    response should be(dummyJobForPost)
+    response should be(true)
   }
 
-  it should "get a delete a Job, given a Job ID" in {
+  it should "delete a Job, given a Job ID" in {
     val jobId = UUID.randomUUID
     val expectedResponse = Map("id" -> jobId.toString, "msg" -> "Deleted", "rowsAffected" -> "1")
     val jsonResponse = JsonUtils.toJson(expectedResponse)
@@ -92,7 +93,7 @@ class SteveClientSpec extends FlatSpec {
     response should be(expectedResponse.get("rowsAffected"))
   }
 
-  it should "get a item status distribution for a given Job ID" in {
+  it should "get the item status distribution for a given Job ID" in {
     val jobId = UUID.randomUUID
     val dummyStats = Map("CRASHED" -> 1, "FINISHED" -> 7, "IN_PROGRESS" -> 2)
     val dummyResponse = JsonUtils.toJson(dummyStats)
@@ -128,7 +129,7 @@ class SteveClientSpec extends FlatSpec {
     response should be(expectedResponse.get("id"))
   }
 
-  it should "get a Item's details for a given Item ID" in {
+  it should "get the Item's details for a given Item ID" in {
     val itemId = UUID.randomUUID
     val jobId = UUID.randomUUID
     val dummyItem = Item(id = itemId, jobId = jobId, status = "START", createdAt = new Date(), updatedAt = None, attributes = Map("test" -> "test"))
@@ -145,35 +146,22 @@ class SteveClientSpec extends FlatSpec {
     response should be(dummyItem)
   }
 
-  it should "update a Item's status" in {
+  it should "update the Item's status" in {
     val itemId = UUID.randomUUID
-    val jobId = UUID.randomUUID
-    val dummyItemForGet = Item(id = itemId, jobId = jobId, status = "NEW", createdAt = new Date(), updatedAt = None, attributes = Map("test" -> "test"))
-    val dummyItemForPost = dummyItemForGet.copy(status = "UPDATE")
-    val dummyResponseForGet = JsonUtils.toJson(dummyItemForGet)
-    val dummyResponseForPost = JsonUtils.toJson(dummyItemForPost)
-
     when {
-      mockHttp(s"$host/item/${itemId.toString}")
-        .method("GET")
-        .timeout(anyInt(),anyInt())
-        .asString
-    }.thenReturn(HttpResponse[String](dummyResponseForGet, 200, Map()))
-
-    when {
-      mockHttp(s"$host/item/${itemId.toString}")
-        .postData(JsonUtils.toJson(dummyItemForPost))
+      mockHttp(s"$host/item/${itemId.toString}/status")
+        .postData("UPDATE")
         .header("content-type", "application/json")
         .method("POST")
         .timeout(anyInt(),anyInt())
         .asString
-    }.thenReturn(HttpResponse[String](dummyResponseForPost, 200, Map()))
+    }.thenReturn(HttpResponse[String](itemId.toString, 200, Map()))
 
     val response = client.updateItemStatus(itemId.toString, "UPDATE")
-    response should be(dummyItemForPost)
+    response should be(true)
   }
 
-  it should "get a delete a Item, given an Item ID" in {
+  it should "delete the Item, given an Item ID" in {
     val itemId = UUID.randomUUID
     val expectedResponse = Map("id" -> itemId.toString, "msg" -> "Deleted", "rowsAffected" -> "1")
     val jsonResponse = JsonUtils.toJson(expectedResponse)

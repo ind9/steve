@@ -42,18 +42,22 @@ class SteveClient(httpClient: BaseHttp, host: String) {
     jobInfo
   }
 
-  def updateJobState(jobId: String, state: String): Job = {
-    //TODO - Change the below to in-place updates
-    val job = getJob(jobId)
-    val data = JsonUtils.toJson(job.copy(state = state))
-    val response = httpClient(s"$host/job/${jobId.toString}")
-      .postData(data)
+  def getJobIdsByState(state: String) = {
+    val response = httpClient(s"$host/job?state=$state")
+      .method("GET")
+      .timeout(connTimeoutMs = connectionTimeoutInMillis,readTimeoutMs = readTimeoutInMillis)
+      .asString
+    JsonUtils.fromJson[List[String]](response.body)
+  }
+
+  def updateJobState(jobId: String, state: String): Boolean = {
+    val response = httpClient(s"$host/job/${jobId.toString}/state")
+      .postData(state)
       .header("content-type", "application/json")
       .method("POST")
       .timeout(connTimeoutMs = connectionTimeoutInMillis,readTimeoutMs = readTimeoutInMillis)
       .asString
-    val jobInfo = JsonUtils.fromJson[Job](response.body)
-    jobInfo
+    response.is2xx
   }
 
   def deleteJob(jobId: String): Option[String] = {
@@ -107,18 +111,28 @@ class SteveClient(httpClient: BaseHttp, host: String) {
     itemInfo
   }
 
-  def updateItemStatus(itemId: String, status: String): Item = {
-    //TODO - Change the below to in-place updates
-    val item = getItem(itemId)
-    val data = JsonUtils.toJson(item.copy(status = status))
-    val response = httpClient(s"$host/item/$itemId")
-      .postData(data)
+  def updateItemStatus(itemId: String, status: String): Boolean = {
+    val response = httpClient(s"$host/item/$itemId/status")
+      .postData(status)
       .header("content-type", "application/json")
       .method("POST")
       .timeout(connTimeoutMs = connectionTimeoutInMillis,readTimeoutMs = readTimeoutInMillis)
       .asString
-    val itemInfo = JsonUtils.fromJson[Item](response.body)
-    itemInfo
+    response.is2xx
+  }
+
+  def updateItemStatus(queryAttrs: Map[String, String], queryStatus: Option[String], updateStatus:String): Boolean = {
+    val qsMap = queryStatus.map(status => Map("status" -> status)).getOrElse(Map()) ++ queryAttrs
+    val queryString = qsMap.map{
+      case(key,value) => key + "=" + value
+    }.mkString("&")
+    val response = httpClient(s"$host/item/status?$queryString")
+      .postData(updateStatus)
+      .header("content-type", "application/json")
+      .method("POST")
+      .timeout(connTimeoutMs = connectionTimeoutInMillis,readTimeoutMs = readTimeoutInMillis)
+      .asString
+    response.is2xx
   }
 
   def deleteItem(itemId: String): Option[String] = {

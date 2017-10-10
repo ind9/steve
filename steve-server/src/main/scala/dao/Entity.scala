@@ -92,9 +92,21 @@ class Jobs @Inject()(db: Database) extends GenericDAO[JobTable,UUID](db) {
 
   override def getId(row: JobTable): Rep[UUID] = row.id
 
+  def getJobIdsByState(state: String): Future[Seq[UUID]] = {
+    db.run {
+      table.filter(_.state === state).map(c => c.id).result
+    }
+  }
+
   def update(updatedJob: Job): Future[Int] = {
     db.run {
       table.filter(_.id === updatedJob.id).update(updatedJob.copy(updatedAt = Some(new Date())))
+    }
+  }
+
+  def updateStateById(id: UUID, state:String): Future[Int] = {
+    db.run {
+      table.filter(_.id === id).map(c => c.state).update(state)
     }
   }
 
@@ -110,6 +122,36 @@ class Items @Inject()(db: Database) extends GenericDAO[ItemTable,UUID](db) {
   def update(updatedItem: Item): Future[Int] = {
     db.run {
       table.filter(_.id === updatedItem.id).update(updatedItem.copy(updatedAt = Some(new Date())))
+    }
+  }
+
+  def updateStatusByJobId(jobId:UUID, status:String): Future[Int] = {
+    db.run {
+      table.filter(_.jobId === jobId).map(c => c.status).update(status)
+    }
+  }
+
+  private def filterById(id: Option[UUID], query: Query[ItemTable, ItemTable#TableElementType, scala.Seq]) = id.map(idVal => query.filter(_.id === idVal)).getOrElse(query)
+
+  private def filterByJobId(jobId: Option[UUID], query: Query[ItemTable, ItemTable#TableElementType, scala.Seq]) = jobId.map(jobIdVal => query.filter(_.jobId === jobIdVal)).getOrElse(query)
+
+  private def filterByStatus(status: Option[String], query: Query[ItemTable, ItemTable#TableElementType, scala.Seq]) = status.map(statusVal => query.filter(_.status === statusVal)).getOrElse(query)
+
+  private def filterByAttributes(attributes: Map[String, String], table: StevePostgresProfile.api.TableQuery[ItemTable]) = attributes match {
+    case attr if attr == null || attr.isEmpty => table
+    case attr => table.filter(f => attr.map {
+      case (key, value) => f.attributes.>>[String](key.bind) === value.bind
+    }.reduceLeft(_ && _))
+  }
+
+
+  def updateStatus(id: Option[UUID], jobId: Option[UUID], queryStatus: Option[String], attributes: Map[String, String], updateStatus: String): Future[Int] = {
+    db.run {
+      //TODO: Check if there's a better way to get the below done?!
+      filterById(id,
+        filterByJobId(jobId,
+          filterByStatus(queryStatus,
+            filterByAttributes(attributes, table)))).map(c => c.status).update(updateStatus)
     }
   }
 

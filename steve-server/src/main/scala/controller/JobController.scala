@@ -39,6 +39,16 @@ class JobController @Inject()(steveConfiguration: SteveConfiguration, jobs: Jobs
     }
   }
 
+  @GET
+  @Path("/")
+  @Produces(Array(MediaType.APPLICATION_JSON))
+  def getJobIds(@QueryParam("state") state: String, @Suspended res: AsyncResponse) = {
+    jobs.getJobIdsByState(state).onComplete {
+      case Success(ids) => res.resume(Response.status(Status.OK).entity(ids).build())
+      case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
+    }
+  }
+
   @POST
   @Path("/{id}")
   @Produces(Array(MediaType.APPLICATION_JSON))
@@ -46,6 +56,16 @@ class JobController @Inject()(steveConfiguration: SteveConfiguration, jobs: Jobs
     val updatedJob: Job = job.copy(id = jobId, updatedAt = Some(new Date()))
     jobs.update(updatedJob).onComplete {
       case Success(_) => res.resume(Response.status(Status.OK).entity(updatedJob).build())
+      case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
+    }
+  }
+
+  @POST
+  @Path("/{id}/state")
+  @Produces(Array(MediaType.APPLICATION_JSON))
+  def updateJobState(@PathParam("id") jobId: UUID, state: String, @Suspended res: AsyncResponse) = {
+    jobs.updateStateById(jobId,state).onComplete {
+      case Success(_) => res.resume(Response.status(Status.OK).entity(jobId).build())
       case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
     }
   }
