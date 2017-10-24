@@ -40,7 +40,10 @@ lazy val steveScalaClient = (project in file("steve-client-scala"))
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
   .settings(sonatypePublishSettings: _*)
+  .settings(compileForScalaTwoTen: _*)
   .dependsOn(steveCore)
+
+lazy val compileForScalaTwoTen = Seq(crossScalaVersions ++= Seq("2.10.4"))
 
 lazy val commonSettings = Seq(
   version := libVersion,
@@ -48,7 +51,7 @@ lazy val commonSettings = Seq(
   packageOptions := Seq(ManifestAttributes(("Built-By", InetAddress.getLocalHost.getHostName))),
   parallelExecution in This := false,
   scalaVersion := "2.12.3",
-  crossScalaVersions := Seq("2.12.3", "2.11.11"),
+  crossScalaVersions ++= Seq("2.12.3", "2.11.11"),
   organizationName := "Indix",
   organizationHomepage := Some(url("http://www.indix.com")),
   scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
