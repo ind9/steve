@@ -21,6 +21,7 @@ lazy val steveCore = (project in file("steve-core"))
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
   .settings(sonatypePublishSettings: _*)
+  .settings(publishForScalaTwoTen: _*)
 
 lazy val steveServer = (project in file("steve-server"))
   .settings(
@@ -40,10 +41,10 @@ lazy val steveScalaClient = (project in file("steve-client-scala"))
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
   .settings(sonatypePublishSettings: _*)
-  .settings(compileForScalaTwoTen: _*)
+  .settings(publishForScalaTwoTen: _*)
   .dependsOn(steveCore)
 
-lazy val compileForScalaTwoTen = Seq(crossScalaVersions ++= Seq("2.10.4"))
+lazy val publishForScalaTwoTen = Seq(crossScalaVersions ++= Seq("2.10.4"))
 
 lazy val commonSettings = Seq(
   version := libVersion,
