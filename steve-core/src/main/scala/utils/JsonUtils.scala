@@ -23,13 +23,16 @@ object JsonUtils {
 }
 
 object DateConverter {
-  def fromString(string: Option[String]): Option[Date] = {
-    if (string.isDefined) {
-      Some(fromString(string.get))
-    } else {
-      None
+
+  implicit class OptionalDateFromString(dateString: Option[String]) {
+    def toDate: Option[Date] = dateString match {
+      case Some(date) => Some(date.toDate)
+      case None => None
     }
   }
 
-  def fromString(string: String): Date = new Date(string.toLong)
+  implicit class DateFromString(str: String) {
+    def toDate: Date = new Date(str.toLong)
+  }
+
 }
