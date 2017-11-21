@@ -10,6 +10,7 @@ import com.google.inject.Inject
 import dao.Items
 import domain.Item
 import steve.SteveConfiguration
+import utils.DateConverter
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -139,16 +140,4 @@ class ItemController @Inject()(steveConfiguration: SteveConfiguration, items: It
       case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
     }
   }
-}
-
-object DateConverter {
-  def fromString(string: Option[String]): Option[Date] = {
-    if (string.isDefined) {
-      Some(fromString(string.get))
-    } else {
-      None
-    }
-  }
-
-  def fromString(string: String): Date = new Date(string.toLong)
 }
