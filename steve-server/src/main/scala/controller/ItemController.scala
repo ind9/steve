@@ -123,4 +123,30 @@ class ItemController @Inject()(steveConfiguration: SteveConfiguration, items: It
       case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
     }
   }
+
+  @GET
+  @Path("/stats")
+  @Produces(Array(MediaType.APPLICATION_JSON))
+  def getStats(
+                @QueryParam("site") site: String,
+                @QueryParam("from") fromDate: String,
+                @QueryParam("to") toDate: Option[String],
+                @Suspended res: AsyncResponse
+              ) = {
+    items.stats("url", site, new Date(fromDate.toLong), DateConverter.fromString(toDate)).onComplete {
+      case Success(None) => res.resume(Response.status(Status.NOT_FOUND).entity(Map("msg" -> "Not Found")).build())
+      case Success(results: List[(String, Int)]) => res.resume(Response.status(Status.OK).entity(results.toMap).build())
+      case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
+    }
+  }
+}
+
+object DateConverter {
+  def fromString(string: Option[String]): Option[Date] = {
+    if (string.isDefined) {
+      Some(new Date(string.get.toLong))
+    } else {
+      None
+    }
+  }
 }
