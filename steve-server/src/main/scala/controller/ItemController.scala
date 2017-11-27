@@ -138,7 +138,7 @@ class ItemController @Inject()(steveConfiguration: SteveConfiguration, items: It
                 @QueryParam("to") to: Option[String],
                 @Suspended res: AsyncResponse
               ) = {
-    items.stats("url", site, from.toDate, to.toDate).onComplete {
+    items.stats("site", site, from.toDate, to.toDate).onComplete {
       case Success(None) => res.resume(Response.status(Status.NOT_FOUND).entity(Map("msg" -> "Not Found")).build())
       case Success(results: List[(String, Int)]) => res.resume(Response.status(Status.OK).entity(results.toMap).build())
       case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
