@@ -1,5 +1,7 @@
 package utils
 
+import java.util.Date
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 
@@ -18,4 +20,19 @@ object JsonUtils {
       .registerModule(DefaultScalaModule)
       .writeValueAsString(input)
   }
+}
+
+object DateConverter {
+
+  implicit class OptionalDateFromString(dateString: Option[String]) {
+    def toDate: Option[Date] = dateString match {
+      case Some(date) => Some(date.toDate)
+      case None => None
+    }
+  }
+
+  implicit class DateFromString(str: String) {
+    def toDate: Date = new Date(str.toLong)
+  }
+
 }

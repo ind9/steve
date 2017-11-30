@@ -179,4 +179,32 @@ class Items @Inject()(db: Database) extends GenericDAO[ItemTable,UUID](db) {
         .result
     }
   }
+
+  def stats(attributeKey: String, attributeValue: String, fromDate: Date, toDate: Option[Date]): Future[_] = {
+    db.run {
+      table.filter(_.attributes.+>(attributeKey) === attributeValue)
+        .filter(_.createdAt >= fromDate)
+        .filter(r => toDate.fold(true.bind)(r.createdAt <= _))
+        .groupBy(_.status)
+        .map {
+          case (id, group) => (id, group.map(_.status).length)
+        }
+        .to[List]
+        .result
+    }
+  }
+
+  def statsAttrPattern(attributeKey: String, attributeValuePattern: String, fromDate: Date, toDate: Option[Date]): Future[_] = {
+    db.run {
+      table.filter(_.attributes.+>(attributeKey) like s"%$attributeValuePattern%")
+        .filter(_.createdAt >= fromDate)
+        .filter(r => toDate.fold(true.bind)(r.createdAt <= _))
+        .groupBy(_.status)
+        .map {
+          case (id, group) => (id, group.map(_.status).length)
+        }
+        .to[List]
+        .result
+    }
+  }
 }

@@ -10,6 +10,7 @@ import com.google.inject.Inject
 import dao.Items
 import domain.Item
 import steve.SteveConfiguration
+import utils.DateConverter._
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -25,7 +26,9 @@ class ItemController @Inject()(steveConfiguration: SteveConfiguration, items: It
     val newItem: Item = item.copy(id = UUID.randomUUID, createdAt = new Date())
     items.insert(newItem).onComplete {
       case Success(_) => res.resume(Response.status(Status.CREATED).entity(Map("id" -> newItem.id, "msg" -> "Created")).build())
-      case Failure(error) => {error.printStackTrace(); res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())}
+      case Failure(error) => {
+        error.printStackTrace(); res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
+      }
     }
   }
 
@@ -36,7 +39,9 @@ class ItemController @Inject()(steveConfiguration: SteveConfiguration, items: It
     val newItems = itemList.map(item => item.copy(id = UUID.randomUUID, createdAt = new Date()))
     items.insert(newItems).onComplete {
       case Success(_) => res.resume(Response.status(Status.CREATED).entity(Map("msg" -> "Created")).build())
-      case Failure(error) => {error.printStackTrace(); res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())}
+      case Failure(error) => {
+        error.printStackTrace(); res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
+      }
     }
   }
 
@@ -56,22 +61,22 @@ class ItemController @Inject()(steveConfiguration: SteveConfiguration, items: It
   @Path("/status")
   @Produces(Array(MediaType.APPLICATION_JSON))
   def checkItemStatus(@QueryParam("jobId") jobId: UUID, @QueryParam("status") status: String, @Suspended res: AsyncResponse) = {
-    if(status.startsWith("!")){
-      if(status.size < 2)
-        res.resume(Response.status(Status.BAD_REQUEST).entity(Map("msg"->"Invalid query param: status")).build())
-      items.checkIfStatusNotPresent(jobId, status.substring(1)).onComplete{
+    if (status.startsWith("!")) {
+      if (status.size < 2)
+        res.resume(Response.status(Status.BAD_REQUEST).entity(Map("msg" -> "Invalid query param: status")).build())
+      items.checkIfStatusNotPresent(jobId, status.substring(1)).onComplete {
         case Success(present) if present => res.resume(Response.status(Status.OK).build())
         case Success(present) if !present => res.resume(Response.status(Status.NOT_FOUND).build())
         case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
       }
-    } else if(!status.isEmpty){
-      items.checkIfStatusPresent(jobId,status).onComplete{
+    } else if (!status.isEmpty) {
+      items.checkIfStatusPresent(jobId, status).onComplete {
         case Success(present) if present => res.resume(Response.status(Status.OK).build())
         case Success(present) if !present => res.resume(Response.status(Status.NOT_FOUND).build())
         case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
       }
     } else {
-      res.resume(Response.status(Status.BAD_REQUEST).entity(Map("msg"->"Invalid query param: status")).build())
+      res.resume(Response.status(Status.BAD_REQUEST).entity(Map("msg" -> "Invalid query param: status")).build())
     }
   }
 
@@ -120,6 +125,22 @@ class ItemController @Inject()(steveConfiguration: SteveConfiguration, items: It
     items.delete(itemId).onComplete {
       case Success(rowsDeleted) if rowsDeleted == 0 => res.resume(Response.status(Status.NOT_FOUND).entity(Map("id" -> itemId, "msg" -> "Not Found")).build())
       case Success(rowsDeleted) => res.resume(Response.status(Status.OK).entity(Map("id" -> itemId, "msg" -> s"Deleted", "rowsAffected" -> rowsDeleted)).build())
+      case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
+    }
+  }
+
+  @GET
+  @Path("/stats")
+  @Produces(Array(MediaType.APPLICATION_JSON))
+  def getStats(
+                @QueryParam("site") site: String,
+                @QueryParam("from") from: String,
+                @QueryParam("to") to: Option[String],
+                @Suspended res: AsyncResponse
+              ) = {
+    items.stats("site", site, from.toDate, to.toDate).onComplete {
+      case Success(None) => res.resume(Response.status(Status.NOT_FOUND).entity(Map("msg" -> "Not Found")).build())
+      case Success(results: List[(String, Int)]) => res.resume(Response.status(Status.OK).entity(results.toMap).build())
       case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
     }
   }
