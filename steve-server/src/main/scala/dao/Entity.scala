@@ -152,7 +152,7 @@ class Items @Inject()(db: Database) extends GenericDAO[ItemTable,UUID](db) {
   private def filterByAttributes(attributes: Map[String, String], table: StevePostgresProfile.api.TableQuery[ItemTable]) = attributes match {
     case attr if attr == null || attr.isEmpty => table
     case attr => table.filter(f => attr.map {
-      case (key, value) => f.attributes.>>[String](key.bind) === value.bind
+      case (key, value) => f.attributes.+>(key.bind) === value.bind
     }.reduceLeft(_ && _))
   }
 
