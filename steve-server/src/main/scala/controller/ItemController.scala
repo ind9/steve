@@ -26,10 +26,7 @@ class ItemController @Inject()(steveConfiguration: SteveConfiguration, items: It
     val newItem: Item = item.copy(id = Option(item.id).getOrElse(UUID.randomUUID.toString), createdAt = new Date())
     items.insert(newItem).onComplete {
       case Success(_) => res.resume(Response.status(Status.CREATED).entity(Map("id" -> newItem.id, "msg" -> "Created")).build())
-      case Failure(error) => {
-        error.printStackTrace();
-        res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
-      }
+      case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
     }
   }
 
@@ -37,15 +34,10 @@ class ItemController @Inject()(steveConfiguration: SteveConfiguration, items: It
   @Path("/bulk")
   @Produces(Array(MediaType.APPLICATION_JSON))
   def createItems(itemList: List[Item], @Suspended res: AsyncResponse) = {
-    println(itemList)
-
     val newItems = itemList.map(item => item.copy(id = Option(item.id).getOrElse(UUID.randomUUID.toString), createdAt = new Date()))
     items.insert(newItems).onComplete {
       case Success(_) => res.resume(Response.status(Status.CREATED).entity(Map("msg" -> "Created")).build())
-      case Failure(error) => {
-        error.printStackTrace();
-        res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
-      }
+      case Failure(error) => res.resume(Response.status(Status.INTERNAL_SERVER_ERROR).entity(Map("msg" -> error.getMessage)).build())
     }
   }
 
