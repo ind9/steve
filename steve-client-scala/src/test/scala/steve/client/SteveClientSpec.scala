@@ -34,7 +34,7 @@ class SteveClientSpec extends FlatSpec {
   }
 
   it should "get the Job's details for a given Job ID" in {
-    val jobId = UUID.randomUUID
+    val jobId = 1L
     val dummyJob = Job(id = jobId, appName = "cannonball", state = "START", createdAt = new Date(), updatedAt = None, attributes = Map("test" -> "test"))
     val dummyResponse = JsonUtils.toJson(dummyJob)
 
@@ -130,8 +130,8 @@ class SteveClientSpec extends FlatSpec {
   }
 
   it should "get the Item's details for a given Item ID" in {
-    val itemId = UUID.randomUUID
-    val jobId = UUID.randomUUID
+    val itemId = UUID.randomUUID.toString
+    val jobId = 1L
     val dummyItem = Item(id = itemId, jobId = jobId, status = "START", createdAt = new Date(), updatedAt = None, attributes = Map("test" -> "test"))
     val dummyResponse = JsonUtils.toJson(dummyItem)
 
