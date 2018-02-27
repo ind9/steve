@@ -1,6 +1,6 @@
 package dao
 
-import java.util.{Date, UUID}
+import java.util.Date
 
 import com.google.inject.{Inject, Singleton}
 import dao.StevePostgresProfile.api._
@@ -8,10 +8,10 @@ import domain.{Item, Job}
 import slick.ast.BaseTypedType
 import slick.lifted.AbstractTable
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class JobTable(tag: Tag) extends Table[Job](tag, Some("public"), "job") {
-  def id = column[UUID]("id", O.PrimaryKey)
+  def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
 
   def appName = column[String]("app_name")
 
@@ -27,9 +27,9 @@ class JobTable(tag: Tag) extends Table[Job](tag, Some("public"), "job") {
 }
 
 class ItemTable(tag: Tag) extends Table[Item](tag, Some("public"), "item") {
-  def id = column[UUID]("id", O.PrimaryKey)
+  def id = column[String]("id")
 
-  def jobId = column[UUID]("job_id")
+  def jobId = column[Long]("job_id")
 
   def status = column[String]("status")
 
@@ -41,7 +41,9 @@ class ItemTable(tag: Tag) extends Table[Item](tag, Some("public"), "item") {
 
   protected val jobTableQuery = TableQuery[JobTable]
 
-  def jobForeignKey = foreignKey("JOB_ID_FK", jobId, jobTableQuery)(_.id, onDelete=ForeignKeyAction.Cascade)
+  def pKey = primaryKey("item_pkey", (id, jobId))
+
+  def jobForeignKey = foreignKey("item_job_id_fkey", jobId, jobTableQuery)(_.id, onDelete = ForeignKeyAction.Cascade)
 
   def * = (id, jobId, status, createdAt, updatedAt, attributes) <> (Item.tupled, Item.unapply)
 }
@@ -61,7 +63,9 @@ abstract class GenericDAO[T <: AbstractTable[_], I: BaseTypedType](db: Database)
   }
 
   def insert(entities: List[T#TableElementType]): Future[Option[Int]] = {
-    db.run{table ++= entities}
+    db.run {
+      table ++= entities
+    }
   }
 
   def select(id: Id): Future[Option[_]] = {
@@ -86,13 +90,21 @@ abstract class GenericDAO[T <: AbstractTable[_], I: BaseTypedType](db: Database)
 }
 
 @Singleton
-class Jobs @Inject()(db: Database) extends GenericDAO[JobTable,UUID](db) {
+class Jobs @Inject()(db: Database, implicit val ec: ExecutionContext) extends GenericDAO[JobTable, Long](db) {
 
   val table: TableQuery[JobTable] = TableQuery[JobTable]
 
-  override def getId(row: JobTable): Rep[UUID] = row.id
+  override def getId(row: JobTable): Rep[Long] = row.id
 
-  def getJobIdsByState(state: String): Future[Seq[UUID]] = {
+  val insertQuery = table returning table.map(_.id) into ((job, id) => job.copy(id = id))
+
+  def insertSelect(entity: Job): Future[Job] = {
+    db.run {
+      insertQuery += entity.copy(id = 0)
+    }
+  }
+
+  def getJobIdsByState(state: String): Future[Seq[Long]] = {
     db.run {
       table.filter(_.state === state).map(c => c.id).result
     }
@@ -104,7 +116,7 @@ class Jobs @Inject()(db: Database) extends GenericDAO[JobTable,UUID](db) {
     }
   }
 
-  def updateStateById(id: UUID, state:String): Future[Int] = {
+  def updateStateById(id: Long, state: String): Future[Int] = {
     db.run {
       table.filter(_.id === id).map(c => c.state).update(state)
     }
@@ -113,19 +125,19 @@ class Jobs @Inject()(db: Database) extends GenericDAO[JobTable,UUID](db) {
 }
 
 @Singleton
-class Items @Inject()(db: Database) extends GenericDAO[ItemTable,UUID](db) {
+class Items @Inject()(db: Database) extends GenericDAO[ItemTable, String](db) {
 
   val table: TableQuery[ItemTable] = TableQuery[ItemTable]
 
-  override def getId(row: ItemTable): Rep[UUID] = row.id
+  override def getId(row: ItemTable): Rep[String] = row.id
 
-  def checkIfStatusNotPresent(jobId:UUID, status:String): Future[Boolean] = {
+  def checkIfStatusNotPresent(jobId: Long, status: String): Future[Boolean] = {
     db.run {
       table.filter(_.jobId === jobId).filterNot(_.status === status).exists.result
     }
   }
 
-  def checkIfStatusPresent(jobId:UUID, status:String): Future[Boolean] = {
+  def checkIfStatusPresent(jobId: Long, status: String): Future[Boolean] = {
     db.run {
       table.filter(_.jobId === jobId).filter(_.status === status).exists.result
     }
@@ -137,15 +149,15 @@ class Items @Inject()(db: Database) extends GenericDAO[ItemTable,UUID](db) {
     }
   }
 
-  def updateStatusByJobId(jobId:UUID, status:String): Future[Int] = {
+  def updateStatusByJobId(jobId: Long, status: String): Future[Int] = {
     db.run {
       table.filter(_.jobId === jobId).map(c => c.status).update(status)
     }
   }
 
-  private def filterById(id: Option[UUID], query: Query[ItemTable, ItemTable#TableElementType, scala.Seq]) = id.map(idVal => query.filter(_.id === idVal)).getOrElse(query)
+  private def filterById(id: Option[String], query: Query[ItemTable, ItemTable#TableElementType, scala.Seq]) = id.map(idVal => query.filter(_.id === idVal)).getOrElse(query)
 
-  private def filterByJobId(jobId: Option[UUID], query: Query[ItemTable, ItemTable#TableElementType, scala.Seq]) = jobId.map(jobIdVal => query.filter(_.jobId === jobIdVal)).getOrElse(query)
+  private def filterByJobId(jobId: Option[Long], query: Query[ItemTable, ItemTable#TableElementType, scala.Seq]) = jobId.map(jobIdVal => query.filter(_.jobId === jobIdVal)).getOrElse(query)
 
   private def filterByStatus(status: Option[String], query: Query[ItemTable, ItemTable#TableElementType, scala.Seq]) = status.map(statusVal => query.filter(_.status === statusVal)).getOrElse(query)
 
@@ -157,7 +169,7 @@ class Items @Inject()(db: Database) extends GenericDAO[ItemTable,UUID](db) {
   }
 
 
-  def updateStatus(id: Option[UUID], jobId: Option[UUID], queryStatus: Option[String], attributes: Map[String, String], updateStatus: String): Future[Int] = {
+  def updateStatus(id: Option[String], jobId: Option[Long], queryStatus: Option[String], attributes: Map[String, String], updateStatus: String): Future[Int] = {
     db.run {
       //TODO: Check if there's a better way to get the below done?!
       filterById(id,
@@ -168,7 +180,7 @@ class Items @Inject()(db: Database) extends GenericDAO[ItemTable,UUID](db) {
   }
 
   // TODO refactor and move this to a nicer place.
-  def stats(jobId: UUID): Future[_] = {
+  def stats(jobId: Long): Future[_] = {
     db.run {
       table.filter(_.jobId === jobId)
         .groupBy(_.status)
