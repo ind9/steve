@@ -22,6 +22,8 @@
   "labels": {
     {{if .Env.ROUTER_HOSTS}}"router.hosts": "{{ .Env.ROUTER_HOSTS }}",{{end}}
     {{if .Env.ROUTER_HOSTS}}"HAPROXY_0_VHOST": "{{ .Env.ROUTER_HOSTS }}",{{end}}
+    "HAPROXY_GROUP": "external",
+    "HAPROXY_0_MODE": "http"
   },
   "env": {
     "DB_HOST": "{{ .Env.DB_HOST }}",
