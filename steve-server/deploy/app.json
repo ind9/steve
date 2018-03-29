@@ -20,7 +20,8 @@
   "maximumOverCapacity": 0.5
   },
   "labels": {
-    {{if .Env.ROUTER_HOSTS}}"router.hosts": "{{ .Env.ROUTER_HOSTS }}"{{end}}
+    {{if .Env.ROUTER_HOSTS}}"router.hosts": "{{ .Env.ROUTER_HOSTS }}",{{end}}
+    {{if .Env.ROUTER_HOSTS}}"HAPROXY_0_VHOST": "{{ .Env.ROUTER_HOSTS }}",{{end}}
   },
   "env": {
     "DB_HOST": "{{ .Env.DB_HOST }}",
