@@ -12,7 +12,6 @@
   "cmd": "s3cmd get s3://indix-build-artifacts/{{.Env.GO_PIPELINE_NAME}}/push-s3/push/{{.Env.GO_PIPELINE_COUNTER}}.{{.Env.GO_STAGE_COUNTER}}/steve-server/service_package/service_pack/steve-service.tgz && tar -xvzf steve-service.tgz && bash bin/deploy.sh $PORT0 $PORT1",
   "uris": [],
   "constraints": [
-    ["lifecycle", "LIKE", "{{if .DEPLOY_ENV | eq "production"}}ondemand{{else}}spot{{end}}"],
     ["app", "LIKE", "apps-{{.DEPLOY_ENV}}"]
   ],
   "upgradeStrategy": {
