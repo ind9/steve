@@ -9,8 +9,12 @@
   "ports": [
     0, 0
   ],
-  "cmd": "s3cmd get s3://indix-build-artifacts/{{.Env.GO_PIPELINE_NAME}}/push-s3/push/{{.Env.GO_PIPELINE_COUNTER}}.{{.Env.GO_STAGE_COUNTER}}/steve-server/service_package/service_pack/steve-service.tgz && tar -xvzf steve-service.tgz && bash bin/deploy.sh $PORT0 $PORT1",
-  "uris": [],
+  "cmd": "bash bin/deploy.sh $PORT0 $PORT1",
+  "fetch": [{
+    "uri": "s3a://indix-build-artifacts/{{.Env.GO_PIPELINE_NAME}}/push-s3/push/{{.Env.GO_PIPELINE_COUNTER}}.{{.Env.GO_STAGE_COUNTER}}/steve-server/service_package/service_pack/steve-service.tgz",
+    "extract": true,
+    "cache": true
+  }],
   "constraints": [
     ["app", "LIKE", "apps-{{.DEPLOY_ENV}}"]
   ],
